@@ -165,7 +165,9 @@ assets/logo.png
 
 ## Divisão do trabalho
 
-**Base (IA)**, num branch `base` e com PR para a `main`: esqueleto Flutter, CI, tema, logo, Firebase configurado, login com verificação, regras e testes das regras, publicar → feed → detalhe, rascunho de `docs/requisitos.md` e dos diagramas.
+As entregas da base e do grupo são feitas com commits e push direto para a `main`, sem exigir PR ou aprovação de merge. Cada integrante precisa aceitar o convite de colaborador para ter acesso de escrita.
+
+**Base (IA)**, entregue diretamente na `main`: esqueleto Flutter, CI, tema, logo, Firebase configurado, login com verificação, regras e testes das regras, publicar → feed → detalhe, rascunho de `docs/requisitos.md` e dos diagramas.
 
 **Issues (grupo)**, uma por pessoa, cada uma com critério de aceite:
 

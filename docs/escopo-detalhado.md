@@ -8,7 +8,7 @@ Cada tarefa traz o que fazer e quando ela está pronta. As marcadas com **faltav
 
 - Flutter (Android, iOS e web) + Firebase plano grátis (Authentication e Firestore). Fotos no Cloudinary, porque o Storage exige o plano pago.
 - Estado com `StreamBuilder` + `setState`, sem biblioteca de estado.
-- Cada tarefa vira uma issue no GitHub, feita num branch próprio e entregue por PR para a `main`.
+- Cada tarefa vira uma issue no GitHub e é entregue com commits e push direto para a `main`, sem exigir PR ou aprovação de merge. É necessário aceitar o convite de colaborador para ter acesso de escrita.
 - Login só com e-mail `@cs.unipe.edu.br` verificado.
 
 ---
@@ -102,7 +102,7 @@ itens/{id}
 
 - Convidar os dois como colaboradores em Settings → Collaborators.
 
-**Pronto quando:** os dois conseguem criar branch e abrir PR direto no repo.
+**Pronto quando:** os dois aceitaram os convites e conseguem enviar commits diretamente para a `main`, sem PR.
 
 ---
 
@@ -206,7 +206,7 @@ conversas/{id}/mensagens/{id}
 
 ### 2. Testar no Android e no iOS
 
-- Rodar os casos de teste em cada entrega, assim que o PR for aberto, e não só no fim.
+- Rodar os casos de teste em cada entrega, assim que os commits chegarem à `main`, e não só no fim.
 - Android pelo APK; iOS pelo simulador do iPhone (precisa de Mac com Xcode); web pelo Chrome.
 - Testar entre plataformas: item publicado no Android aparece no iPhone e na web.
 
@@ -231,7 +231,7 @@ conversas/{id}/mensagens/{id}
 ### 5. Conferir a lista de locais no campus (faltava)
 
 - Andar pelo campus e conferir se os locais da spec existem e com que nome: Reitoria, Bloco de Medicina, Odontologia, Enfermagem, Arquitetura, EVA, Biblioteca, Centro de Informação, Pós-Graduação, Auditório, Ginásio, Piscina, Clínica-escola, Praça de alimentação, Passarela, Estacionamento.
-- Corrigir no `lib/config.dart` por PR, ou passar a lista para o Daniel.
+- Corrigir no `lib/config.dart` e enviar o commit diretamente para a `main`, ou passar a lista para o Daniel.
 
 **Pronto quando:** a lista no app bate com o campus.
 
