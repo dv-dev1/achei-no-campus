@@ -1,0 +1,101 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function aluno() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email is string
+        && request.auth.token.email.lower().matches('^[^@\\s]+@cs\\.unipe\\.edu\\.br$');
+    }
+
+    function textoObrigatorio(valor, limite) {
+      return valor is string && valor.size() <= limite
+        && valor.matches('[\\s\\S]*\\S[\\s\\S]*');
+    }
+
+    function itemValido(dados) {
+      return dados.keys().hasAll(['tipo', 'titulo', 'descricao', 'categoria', 'local', 'fotoUrl', 'autorId', 'autorNome', 'status', 'criadoEm'])
+        && dados.keys().hasOnly(['tipo', 'titulo', 'descricao', 'categoria', 'local', 'fotoUrl', 'autorId', 'autorNome', 'status', 'criadoEm'])
+        && dados.tipo in ['perdido', 'achado']
+        && textoObrigatorio(dados.titulo, 120)
+        && dados.descricao is string && dados.descricao.size() <= 2000
+        && dados.categoria in ['Documentos', 'Eletrônicos', 'Chaves', 'Carteira/Dinheiro', 'Garrafa/Copo', 'Roupa/Acessório', 'Material escolar', 'Outros']
+        && dados.local in ['Reitoria', 'Bloco de Medicina', 'Bloco de Odontologia', 'Bloco de Enfermagem', 'Bloco de Arquitetura', 'EVA (Espaço de Vida Acadêmica)', 'Biblioteca', 'Centro de Informação', 'Pós-Graduação', 'Auditório', 'Ginásio', 'Piscina', 'Clínica-escola', 'Praça de alimentação/cantinas', 'Passarela', 'Estacionamento', 'Outro']
+        && dados.fotoUrl is string && dados.fotoUrl.size() <= 2048
+        && (dados.fotoUrl == '' || dados.fotoUrl.matches('https://[^\\s]+'))
+        && dados.autorId is string && textoObrigatorio(dados.autorNome, 80)
+        && dados.status in ['aberto', 'devolvido']
+        && dados.criadoEm is timestamp;
+    }
+
+    function perfilValido(dados) {
+      return dados.keys().hasAll(['nome', 'curso', 'criadoEm'])
+        && dados.keys().hasOnly(['nome', 'curso', 'criadoEm'])
+        && textoObrigatorio(dados.nome, 80)
+        && dados.curso is string && dados.curso.size() <= 120
+        && dados.criadoEm is timestamp;
+    }
+
+    match /itens/{id} {
+      allow read: if aluno();
+      allow create: if aluno() && itemValido(request.resource.data)
+        && request.resource.data.autorId == request.auth.uid
+        && request.resource.data.autorNome == get(/databases/$(database)/documents/usuarios/$(request.auth.uid)).data.nome
+        && request.resource.data.status == 'aberto'
+        && request.resource.data.criadoEm == request.time;
+      allow update: if aluno() && resource.data.autorId == request.auth.uid
+        && itemValido(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['tipo', 'titulo', 'descricao', 'categoria', 'local', 'fotoUrl', 'status']);
+      allow delete: if aluno() && resource.data.autorId == request.auth.uid;
+    }
+
+    match /usuarios/{uid} {
+      allow read: if aluno();
+      allow create: if aluno() && uid == request.auth.uid
+        && perfilValido(request.resource.data) && request.resource.data.criadoEm == request.time;
+      allow update: if aluno() && uid == request.auth.uid
+        && perfilValido(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['nome', 'curso']);
+    }
+
+    function participa(dados) {
+      return aluno() && request.auth.uid in dados.participantes;
+    }
+
+    function conversaValida(dados) {
+      return dados.keys().hasAll(['itemId', 'participantes', 'ultimaMensagem', 'atualizadoEm', 'naoLidas'])
+        && dados.keys().hasOnly(['itemId', 'participantes', 'ultimaMensagem', 'atualizadoEm', 'naoLidas'])
+        && dados.itemId is string
+        && dados.participantes is list && dados.participantes.size() == 2
+        && dados.participantes[0] is string && dados.participantes[1] is string
+        && dados.participantes[0] != dados.participantes[1]
+        && dados.ultimaMensagem is string && dados.ultimaMensagem.size() <= 5000
+        && dados.atualizadoEm is timestamp
+        && dados.naoLidas is map
+        && dados.naoLidas.keys().hasAll(dados.participantes)
+        && dados.naoLidas.keys().hasOnly(dados.participantes)
+        && dados.naoLidas[dados.participantes[0]] is int && dados.naoLidas[dados.participantes[0]] >= 0
+        && dados.naoLidas[dados.participantes[1]] is int && dados.naoLidas[dados.participantes[1]] >= 0;
+    }
+
+    match /conversas/{id} {
+      allow read: if participa(resource.data);
+      allow create: if conversaValida(request.resource.data) && participa(request.resource.data)
+        && request.resource.data.participantes[0] == get(/databases/$(database)/documents/itens/$(request.resource.data.itemId)).data.autorId
+        && id == request.resource.data.itemId + '_' + request.resource.data.participantes[1]
+        && request.resource.data.atualizadoEm == request.time;
+      allow update: if participa(resource.data) && conversaValida(request.resource.data)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['ultimaMensagem', 'atualizadoEm', 'naoLidas']);
+
+      match /mensagens/{mensagemId} {
+        allow read: if participa(get(/databases/$(database)/documents/conversas/$(id)).data);
+        allow create: if participa(get(/databases/$(database)/documents/conversas/$(id)).data)
+          && request.resource.data.keys().hasAll(['autorId', 'texto', 'criadoEm'])
+          && request.resource.data.keys().hasOnly(['autorId', 'texto', 'criadoEm'])
+          && request.resource.data.autorId == request.auth.uid
+          && textoObrigatorio(request.resource.data.texto, 5000)
+          && request.resource.data.criadoEm == request.time;
+      }
+    }
+  }
+}
