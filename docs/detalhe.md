@@ -7,7 +7,7 @@
 De cima para baixo:
 
 1. **Barra do topo:** "Item perdido" ou "Item achado", com a seta para voltar ao feed.
-2. **Foto grande**, na largura da tela (proporção 4:3). Sem foto, ou se o link falhar, aparece um ícone no lugar.
+2. **Foto grande**, na largura da tela (proporção 4:3). Sem foto, ou se o link falhar, aparece um ícone no lugar. Se o item já foi devolvido, logo abaixo vem a faixa amarela "Este item já foi devolvido.".
 3. **Etiqueta** Perdido (amarela) ou Achado (azul), a mesma do card.
 4. **Título** e **descrição**. Se o item não tiver descrição, esse trecho some.
 5. **Informações**, cada uma com um ícone:
@@ -15,11 +15,17 @@ De cima para baixo:
    - **Perdido em** ou **Achado em**, conforme o tipo, com o local;
    - Publicado: data, hora e há quanto tempo, por exemplo "06/10/2026 às 14:30 (há 2 h)";
    - Publicado por: o nome de quem postou. Se for você, aparece "(você)" do lado.
-6. **Botão Conversar**, preso no rodapé.
+6. **Um botão preso no rodapé**, que muda conforme quem está vendo.
 
-## Quem vê o botão Conversar
+## O botão do rodapé
 
-Só quem **não** é o autor do item. Quem publicou não precisa conversar consigo mesmo, então para ele o botão não aparece.
+| Quem está vendo | Botão |
+| --- | --- |
+| Outra pessoa | **Conversar** |
+| Quem publicou | **Marcar como devolvido** (ver [`devolvido.md`](devolvido.md)) |
+| Qualquer um, com o item já devolvido | Nenhum |
+
+Quem publicou não precisa conversar consigo mesmo, então para ele o Conversar dá lugar ao devolvido.
 
 Para saber quem está usando o app, a tela pergunta ao Firebase Auth (`FirebaseAuth.instance.currentUser?.uid`) e compara com o `autorId` do item.
 

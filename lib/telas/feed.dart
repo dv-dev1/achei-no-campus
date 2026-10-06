@@ -38,7 +38,7 @@ Stream<List<Item>> itensAbertosDoFirestore() {
 }
 
 class TelaFeed extends StatefulWidget {
-  const TelaFeed({super.key, this.itens, this.uidDoUsuario});
+  const TelaFeed({super.key, this.itens, this.uidDoUsuario, this.devolver});
 
   /// De onde vêm os itens. Se ficar nulo, usa o Firestore.
   final Stream<List<Item>>? itens;
@@ -46,6 +46,9 @@ class TelaFeed extends StatefulWidget {
   /// Quem está usando o app, repassado ao detalhe. Se ficar nulo, o
   /// detalhe pergunta ao Firebase Auth. Serve para os testes.
   final String? uidDoUsuario;
+
+  /// Repassado ao detalhe, para os testes não gravarem no Firestore.
+  final Future<void> Function(String itemId)? devolver;
 
   @override
   State<TelaFeed> createState() => _TelaFeedState();
@@ -72,8 +75,11 @@ class _TelaFeedState extends State<TelaFeed> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            TelaDetalhe(item: item, uidDoUsuario: widget.uidDoUsuario),
+        builder: (_) => TelaDetalhe(
+          item: item,
+          uidDoUsuario: widget.uidDoUsuario,
+          devolver: widget.devolver,
+        ),
       ),
     );
   }

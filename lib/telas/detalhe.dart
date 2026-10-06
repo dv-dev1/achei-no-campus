@@ -1,5 +1,9 @@
-// Tela de detalhe: tudo sobre um item, com a foto grande e o botão
-// Conversar, para falar com quem publicou.
+// Tela de detalhe: tudo sobre um item, com a foto grande e um botão no
+// rodapé, que muda conforme quem está vendo:
+//
+//   - outra pessoa: Conversar, para falar com quem publicou;
+//   - o dono: Marcar como devolvido;
+//   - item já devolvido: nenhum botão, só o aviso.
 //
 // Abre ao tocar num card do feed.
 
@@ -9,9 +13,15 @@ import 'package:flutter/material.dart';
 import '../modelos/item.dart';
 import '../util/tempo.dart';
 import '../widgets/card_item.dart';
+import '../widgets/devolver.dart';
 
 class TelaDetalhe extends StatelessWidget {
-  const TelaDetalhe({super.key, required this.item, this.uidDoUsuario});
+  const TelaDetalhe({
+    super.key,
+    required this.item,
+    this.uidDoUsuario,
+    this.devolver,
+  });
 
   final Item item;
 
@@ -19,10 +29,13 @@ class TelaDetalhe extends StatelessWidget {
   /// Os testes passam um valor aqui para não depender do Firebase.
   final String? uidDoUsuario;
 
+  /// Como marcar o item como devolvido. Se ficar nulo, grava no Firestore.
+  /// Só os testes passam outra coisa aqui.
+  final Future<void> Function(String itemId)? devolver;
+
   @override
   Widget build(BuildContext context) {
     final uid = uidDoUsuario ?? FirebaseAuth.instance.currentUser?.uid;
-    // Ninguém conversa consigo mesmo: o autor não vê o botão.
     final souOAutor = uid == item.autorId;
 
     final textos = Theme.of(context).textTheme;
@@ -35,6 +48,7 @@ class TelaDetalhe extends StatelessWidget {
         padding: const EdgeInsets.only(bottom: 24),
         children: [
           _FotoGrande(item: item),
+          if (item.devolvido) const _AvisoDevolvido(),
           Padding(
             padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
             child: Column(
@@ -81,19 +95,39 @@ class TelaDetalhe extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: souOAutor
-          ? null
-          : SafeArea(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                child: FilledButton.icon(
-                  onPressed: () => _conversar(context),
-                  icon: const Icon(Icons.chat_bubble_outline),
-                  label: const Text('Conversar'),
-                ),
-              ),
-            ),
+      bottomNavigationBar: _botaoDoRodape(context, souOAutor),
     );
+  }
+
+  Widget? _botaoDoRodape(BuildContext context, bool souOAutor) {
+    // Item devolvido já foi resolvido: não há mais o que fazer com ele.
+    if (item.devolvido) return null;
+
+    final botao = souOAutor
+        // Ninguém conversa consigo mesmo: o dono vê o botão de devolvido.
+        ? FilledButton.icon(
+            onPressed: () => _marcarComoDevolvido(context),
+            icon: const Icon(Icons.check_circle_outline),
+            label: const Text('Marcar como devolvido'),
+          )
+        : FilledButton.icon(
+            onPressed: () => _conversar(context),
+            icon: const Icon(Icons.chat_bubble_outline),
+            label: const Text('Conversar'),
+          );
+
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+        child: botao,
+      ),
+    );
+  }
+
+  Future<void> _marcarComoDevolvido(BuildContext context) async {
+    final marcou = await confirmarEDevolver(context, item, devolver: devolver);
+    // Deu certo: volta ao feed, onde o item já sumiu.
+    if (marcou && context.mounted) Navigator.pop(context);
   }
 
   void _conversar(BuildContext context) {
@@ -112,6 +146,37 @@ String dataEHora(DateTime data, {DateTime? agora}) {
       '${doisDigitos(data.day)}/${doisDigitos(data.month)}/${data.year}';
   final hora = '${doisDigitos(data.hour)}:${doisDigitos(data.minute)}';
   return '$dia às $hora (${tempoDesde(data, agora: agora)})';
+}
+
+/// Faixa logo abaixo da foto avisando que o item já foi devolvido.
+class _AvisoDevolvido extends StatelessWidget {
+  const _AvisoDevolvido();
+
+  @override
+  Widget build(BuildContext context) {
+    final cores = Theme.of(context).colorScheme;
+
+    return Container(
+      width: double.infinity,
+      color: cores.secondary,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle, color: cores.onSecondary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Este item já foi devolvido.',
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: cores.onSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
 
 /// Foto ocupando a largura da tela. Sem foto, ou se o link falhar, mostra
