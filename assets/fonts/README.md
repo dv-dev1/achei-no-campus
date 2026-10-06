@@ -1,0 +1,1 @@
+Fontes Work Sans de https://github.com/weiweihuanghuang/Work-Sans, diretório `fonts/ttf/`. Licença SIL Open Font License em `OFL.txt`. Empacotadas para manter o tema de Cauê e executar o app e os testes sem buscar fontes na rede.

@@ -1,0 +1,25 @@
+name: achei_no_campus
+description: "Achados e perdidos da UNIPÊ, com Firebase local."
+publish_to: 'none'
+version: 1.0.0+1
+environment:
+  sdk: ^3.13.5
+dependencies:
+  flutter:
+    sdk: flutter
+  firebase_core: ^4.15.0
+  firebase_auth: ^6.7.0
+  cloud_firestore: ^6.10.0
+  google_fonts: ^6.3.3
+  image_picker: ^1.2.4
+  http: ^1.6.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  fake_cloud_firestore: ^4.3.0
+  firebase_auth_mocks: ^0.15.2
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/fonts/
