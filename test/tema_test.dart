@@ -53,12 +53,19 @@ void main() {
     );
 
     final fundo = tester.widget<Material>(
-      find.descendant(of: find.byType(Scaffold), matching: find.byType(Material)).first,
+      find
+          .descendant(
+            of: find.byType(Scaffold),
+            matching: find.byType(Material),
+          )
+          .first,
     );
     expect(fundo.color, CoresAchei.fundo);
 
     final barra = tester.widget<Material>(
-      find.descendant(of: find.byType(AppBar), matching: find.byType(Material)).first,
+      find
+          .descendant(of: find.byType(AppBar), matching: find.byType(Material))
+          .first,
     );
     expect(barra.color, CoresAchei.azul);
   });

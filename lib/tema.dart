@@ -51,10 +51,8 @@ ThemeData temaAchei() {
   final base = ThemeData(useMaterial3: true, colorScheme: cores);
 
   // Work Sans em todos os textos, já na cor de texto da identidade.
-  final textos = GoogleFonts.workSansTextTheme(base.textTheme).apply(
-    bodyColor: CoresAchei.texto,
-    displayColor: CoresAchei.texto,
-  );
+  final textos = GoogleFonts.workSansTextTheme(base.textTheme)
+      .apply(bodyColor: CoresAchei.texto, displayColor: CoresAchei.texto);
 
   // Padding comum aos botões, para todos terem a mesma altura.
   const paddingBotao = EdgeInsets.symmetric(horizontal: 24, vertical: 14);
