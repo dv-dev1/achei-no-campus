@@ -1,6 +1,6 @@
 // Tela inicial: lista dos itens abertos, mais recentes primeiro, atualizando
 // em tempo real. Quando alguém publica, o item aparece aqui sozinho, sem
-// recarregar.
+// recarregar. No topo ficam a busca e os filtros (ver docs/filtros.md).
 //
 // Por padrão lê do Firestore. Nos testes, ou enquanto o Firebase não está
 // ligado, dá para passar os itens prontos:
@@ -11,6 +11,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../modelos/item.dart';
+import '../util/filtro.dart';
+import '../widgets/barra_de_filtros.dart';
 import '../widgets/card_item.dart';
 
 /// Quantos itens o feed carrega no máximo (definido na spec).
@@ -50,6 +52,24 @@ class _TelaFeedState extends State<TelaFeed> {
   late final Stream<List<Item>> _itens =
       widget.itens ?? itensAbertosDoFirestore();
 
+  // O que está filtrado e buscado agora. Fica aqui, e não na lista, para
+  // continuar valendo quando o Firestore manda itens novos.
+  final _filtro = Filtro();
+  final _busca = TextEditingController();
+
+  @override
+  void dispose() {
+    _busca.dispose();
+    super.dispose();
+  }
+
+  void _limparFiltros() {
+    setState(() {
+      _filtro.limpar();
+      _busca.clear();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,11 +107,38 @@ class _TelaFeedState extends State<TelaFeed> {
             );
           }
 
-          return ListView.builder(
-            // Espaço no fim para o último card não ficar atrás do botão.
-            padding: const EdgeInsets.only(top: 8, bottom: 96),
-            itemCount: itens.length,
-            itemBuilder: (context, i) => CardItem(item: itens[i]),
+          final visiveis = _filtro.aplicar(itens);
+
+          return Column(
+            children: [
+              BarraDeFiltros(
+                filtro: _filtro,
+                busca: _busca,
+                categorias: opcoesDe(itens, (item) => item.categoria),
+                locais: opcoesDe(itens, (item) => item.local),
+                aoMudar: () => setState(() {}),
+                aoLimpar: _limparFiltros,
+              ),
+              Expanded(
+                child: visiveis.isEmpty
+                    ? _Aviso(
+                        icone: Icons.filter_alt_off,
+                        texto: 'Nenhum item com esses filtros.',
+                        acao: OutlinedButton(
+                          onPressed: _limparFiltros,
+                          child: const Text('Limpar filtros'),
+                        ),
+                      )
+                    : ListView.builder(
+                        // Espaço no fim para o último card não ficar atrás
+                        // do botão de publicar.
+                        padding: const EdgeInsets.only(top: 4, bottom: 96),
+                        itemCount: visiveis.length,
+                        itemBuilder: (context, i) =>
+                            CardItem(item: visiveis[i]),
+                      ),
+              ),
+            ],
           );
         },
       ),
@@ -100,11 +147,13 @@ class _TelaFeedState extends State<TelaFeed> {
 }
 
 /// Mensagem centralizada com ícone, para os estados de vazio e de erro.
+/// `acao` é um botão opcional embaixo do texto.
 class _Aviso extends StatelessWidget {
-  const _Aviso({required this.icone, required this.texto});
+  const _Aviso({required this.icone, required this.texto, this.acao});
 
   final IconData icone;
   final String texto;
+  final Widget? acao;
 
   @override
   Widget build(BuildContext context) {
@@ -123,6 +172,7 @@ class _Aviso extends StatelessWidget {
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyLarge,
             ),
+            if (acao != null) ...[const SizedBox(height: 16), acao!],
           ],
         ),
       ),
