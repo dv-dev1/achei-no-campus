@@ -99,4 +99,4 @@ O teste de tempo real usa um `StreamController` no lugar do Firestore: ele manda
 ## Próximos passos que mexem aqui
 
 - **Filtros e busca:** já estão no topo desta tela. Ver [`filtros.md`](filtros.md).
-- **Detalhe (task 4):** o `CardItem` já tem o parâmetro `aoTocar`, que vai abrir a tela de detalhe.
+- **Detalhe:** tocar num card abre a tela de detalhe. Ver [`detalhe.md`](detalhe.md).

@@ -13,7 +13,7 @@ class CardItem extends StatelessWidget {
 
   final Item item;
 
-  /// O que fazer ao tocar no card (abrir o detalhe, na task 4).
+  /// O que fazer ao tocar no card. No feed, abre o detalhe.
   final VoidCallback? aoTocar;
 
   @override

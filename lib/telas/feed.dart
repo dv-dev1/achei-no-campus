@@ -14,6 +14,7 @@ import '../modelos/item.dart';
 import '../util/filtro.dart';
 import '../widgets/barra_de_filtros.dart';
 import '../widgets/card_item.dart';
+import 'detalhe.dart';
 
 /// Quantos itens o feed carrega no máximo (definido na spec).
 const int limiteDoFeed = 200;
@@ -37,10 +38,14 @@ Stream<List<Item>> itensAbertosDoFirestore() {
 }
 
 class TelaFeed extends StatefulWidget {
-  const TelaFeed({super.key, this.itens});
+  const TelaFeed({super.key, this.itens, this.uidDoUsuario});
 
   /// De onde vêm os itens. Se ficar nulo, usa o Firestore.
   final Stream<List<Item>>? itens;
+
+  /// Quem está usando o app, repassado ao detalhe. Se ficar nulo, o
+  /// detalhe pergunta ao Firebase Auth. Serve para os testes.
+  final String? uidDoUsuario;
 
   @override
   State<TelaFeed> createState() => _TelaFeedState();
@@ -61,6 +66,16 @@ class _TelaFeedState extends State<TelaFeed> {
   void dispose() {
     _busca.dispose();
     super.dispose();
+  }
+
+  void _abrirDetalhe(Item item) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            TelaDetalhe(item: item, uidDoUsuario: widget.uidDoUsuario),
+      ),
+    );
   }
 
   void _limparFiltros() {
@@ -134,8 +149,10 @@ class _TelaFeedState extends State<TelaFeed> {
                         // do botão de publicar.
                         padding: const EdgeInsets.only(top: 4, bottom: 96),
                         itemCount: visiveis.length,
-                        itemBuilder: (context, i) =>
-                            CardItem(item: visiveis[i]),
+                        itemBuilder: (context, i) => CardItem(
+                          item: visiveis[i],
+                          aoTocar: () => _abrirDetalhe(visiveis[i]),
+                        ),
                       ),
               ),
             ],
