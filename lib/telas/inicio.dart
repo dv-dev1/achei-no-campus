@@ -35,11 +35,7 @@ class _TelaInicioState extends State<TelaInicio> {
       body: IndexedStack(
         index: _aba,
         children: [
-          TelaFeed(
-            sessao: widget.sessao,
-            uidDoUsuario: _uid,
-            itens: itensAbertosDoFirestore(firestore: widget.sessao.firestore),
-          ),
+          TelaFeed(sessao: widget.sessao, uidDoUsuario: _uid),
           TelaMensagens(sessao: widget.sessao),
           TelaMeusItens(sessao: widget.sessao, uidDoUsuario: _uid),
         ],

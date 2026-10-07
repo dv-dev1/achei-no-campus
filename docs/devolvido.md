@@ -19,11 +19,13 @@ Só quem publicou. A tela esconde o botão para os outros, mas **quem garante is
 
 ## Como o item some do feed
 
-O botão só grava uma coisa no Firestore:
+O botão só grava uma coisa no Firestore, pelo `Itens.devolver` (em `lib/itens.dart`, junto do editar e do apagar do Daniel):
 
 ```dart
-FirebaseFirestore.instance.collection('itens').doc(itemId).update({'status': 'devolvido'});
+sessao.firestore.collection('itens').doc(itemId).update({'status': 'devolvido'});
 ```
+
+Antes de gravar, ele confere se quem pede é o dono, do mesmo jeito que o editar e o apagar. As regras do Firestore conferem de novo.
 
 Ninguém precisa avisar o feed. Ele está escutando os itens com `status == "aberto"` em tempo real, então, assim que o status muda, o Firestore manda a lista nova sem o item, e ele some da tela de **todos** os usuários, não só da de quem marcou.
 
@@ -31,7 +33,8 @@ Ninguém precisa avisar o feed. Ele está escutando os itens com `status == "abe
 
 | Arquivo | O que faz |
 | --- | --- |
-| `lib/widgets/devolver.dart` | `marcarComoDevolvido` (grava no Firestore) e `confirmarEDevolver` (pergunta, grava e mostra o aviso) |
+| `lib/widgets/devolver.dart` | `marcarComoDevolvido` (chama o `Itens.devolver`) e `confirmarEDevolver` (pergunta, grava e mostra o aviso) |
+| `lib/itens.dart` | `Itens.devolver`: confere o dono e grava o status |
 | `lib/telas/detalhe.dart` | Escolhe o botão do rodapé e mostra a faixa de devolvido |
 
 `confirmarEDevolver` fica fora da tela de propósito: **"Meus itens" usa a mesma função**, para os dois lugares perguntarem e avisarem do mesmo jeito. Ela devolve `true` quando o item foi marcado, para cada tela decidir o que fazer depois (o detalhe volta ao feed).

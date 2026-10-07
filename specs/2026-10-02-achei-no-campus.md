@@ -86,6 +86,7 @@ Tirada do site `unipe.edu.br`:
 - Fonte **Work Sans** (`google_fonts`).
 - Botão em pílula (raio grande); card com raio 12.
 - Logo: lupa azul com estrela amarela dentro. Quatro variações geradas na API de imagem da OpenAI; o grupo escolhe uma, que vira o ícone do app (`flutter_launcher_icons`) e o splash.
+  - *Atualização 07/10:* a logo usada no fim foi outra, feita pelo Cauê: um pino de localização com uma mochila. Ver `docs/icone-e-splash.md`.
 
 ## Modelo de dados (Firestore)
 

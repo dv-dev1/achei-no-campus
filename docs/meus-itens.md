@@ -33,9 +33,9 @@ Três escolhas que valem explicar:
 2. **Tempo real.** Como no feed, a lista escuta o Firestore. Marcou como devolvido, o card troca a etiqueta para **✓ Devolvido** na hora, sem recarregar.
 3. **Segunda garantia.** A consulta já traz só os itens do usuário, mas a tela ainda confere `autorId == uid` antes de mostrar. Nunca aparece item de outra pessoa, mesmo que a consulta mude um dia.
 
-## O botão Editar, por enquanto
+## O botão Editar
 
-Por enquanto, **Editar** só mostra o aviso "A edição ainda está sendo feita.". A tela de edição já existe: o Daniel entregou em 06/10 (`TelaPublicar` com o item), e ela abre pelo ícone de editar no topo do detalhe. Falta ligar este botão a ela. O ponto a trocar está marcado com `TODO(Daniel)` em `lib/telas/meus_itens.dart`, no método `_editar`.
+**Editar** abre a tela de publicar do Daniel já preenchida com o item (`TelaPublicar` com o `item`), a mesma do ícone de editar no topo do detalhe. Salvou, o card se atualiza sozinho, porque a lista escuta o Firestore. Até 07/10 o botão só mostrava um aviso, porque a edição ainda não existia quando esta tela foi feita.
 
 ## Onde está cada coisa
 
@@ -61,6 +61,6 @@ flutter test test/meus_itens_test.dart
 | item devolvido não tem Marcar devolvido | Só o Editar |
 | **critério de pronto:** marcado aqui, aparece como devolvido | Com um Firestore de mentira, a etiqueta troca de Aberto para Devolvido |
 | sem itens | O aviso aparece |
-| Editar | Mostra o aviso provisório |
+| Editar | Abre a tela de publicar com o item preenchido |
 
 Com esta tela, a task 5 ("Marcar como devolvido") também fecha a outra metade do seu critério de pronto: o item aparece como devolvido em "Meus itens".

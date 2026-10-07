@@ -80,6 +80,23 @@ void main() {
     expect((await ref.get()).exists, isTrue);
   });
 
+  test('dono marca como devolvido; item alheio é negado', () async {
+    final id = await publicar();
+    final ref = firestore.collection('itens').doc(id);
+    await itens.devolver(id);
+    expect((await ref.get()).data()!['status'], 'devolvido');
+
+    final alheio = await publicar(titulo: 'Fone');
+    await firestore.collection('itens').doc(alheio).update({
+      'autorId': 'bruno',
+    });
+    await expectLater(itens.devolver(alheio), throwsA(isA<StateError>()));
+    expect(
+      (await firestore.collection('itens').doc(alheio).get()).data()!['status'],
+      'aberto',
+    );
+  });
+
   test('apaga item próprio', () async {
     final id = await publicar();
     await itens.apagar(id);

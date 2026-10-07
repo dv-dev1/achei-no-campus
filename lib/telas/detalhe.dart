@@ -2,10 +2,10 @@
 // rodapé, que muda conforme quem está vendo:
 //
 //   - outra pessoa: Conversar, para falar com quem publicou;
-//   - o dono: Marcar como devolvido;
+//   - o dono: Marcar como devolvido (e, no topo, Editar e Apagar);
 //   - item já devolvido: nenhum botão, só o aviso.
 //
-// Abre ao tocar num card do feed.
+// Abre ao tocar num card do feed ou de "Meus itens".
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +42,10 @@ class TelaDetalhe extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final uid = uidDoUsuario ?? FirebaseAuth.instance.currentUser?.uid;
+    final uid =
+        uidDoUsuario ??
+        sessao?.usuario?.uid ??
+        FirebaseAuth.instance.currentUser?.uid;
     final souOAutor = uid == item.autorId;
 
     final textos = Theme.of(context).textTheme;
@@ -146,7 +149,12 @@ class TelaDetalhe extends StatelessWidget {
   }
 
   Future<void> _marcarComoDevolvido(BuildContext context) async {
-    final marcou = await confirmarEDevolver(context, item, devolver: devolver);
+    final marcou = await confirmarEDevolver(
+      context,
+      item,
+      sessao: sessao,
+      devolver: devolver,
+    );
     // Deu certo: volta ao feed, onde o item já sumiu.
     if (marcou && context.mounted) Navigator.pop(context);
   }

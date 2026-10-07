@@ -1,8 +1,12 @@
 import 'dart:async';
 
 import 'package:achei_no_campus/modelos/item.dart';
+import 'package:achei_no_campus/sessao.dart';
 import 'package:achei_no_campus/telas/meus_itens.dart';
+import 'package:achei_no_campus/telas/publicar.dart';
 import 'package:achei_no_campus/tema.dart';
+import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -41,12 +45,14 @@ void main() {
     Stream<List<Item>> itens, {
     String uid = 'ana',
     Future<void> Function(String)? devolver,
+    Sessao? sessao,
   }) async {
     telaAlta(tester);
     await tester.pumpWidget(
       MaterialApp(
         theme: temaAchei(),
         home: TelaMeusItens(
+          sessao: sessao,
           uidDoUsuario: uid,
           itens: itens,
           devolver: devolver,
@@ -150,12 +156,29 @@ void main() {
     expect(find.textContaining('ainda não publicou'), findsOneWidget);
   });
 
-  testWidgets('Editar avisa enquanto a edição não existe', (tester) async {
-    await abrir(tester, Stream.value([item('1', 'Fone', autor: 'ana')]));
+  testWidgets('Editar abre a tela de publicar já preenchida', (tester) async {
+    final sessao = Sessao(
+      auth: MockFirebaseAuth(
+        mockUser: MockUser(
+          uid: 'ana',
+          email: 'ana@cs.unipe.edu.br',
+          isEmailVerified: true,
+        ),
+        signedIn: true,
+      ),
+      firestore: FakeFirebaseFirestore(),
+    );
+    await abrir(
+      tester,
+      Stream.value([item('1', 'Fone', autor: 'ana')]),
+      sessao: sessao,
+    );
 
     await tester.tap(find.text('Editar'));
-    await tester.pump();
+    await tester.pumpAndSettle();
 
-    expect(find.text('A edição ainda está sendo feita.'), findsOneWidget);
+    final tela = tester.widget<TelaPublicar>(find.byType(TelaPublicar));
+    expect(tela.item?.id, '1');
+    expect(find.widgetWithText(TextFormField, 'Fone'), findsOneWidget);
   });
 }

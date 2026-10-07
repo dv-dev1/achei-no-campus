@@ -61,6 +61,13 @@ class Itens {
     return ref.id;
   }
 
+  Future<void> devolver(String id) async {
+    await _conferirDono(id, _uidVerificado());
+    await sessao.firestore.collection('itens').doc(id).update({
+      'status': 'devolvido',
+    });
+  }
+
   Future<void> apagar(String id) async {
     await _conferirDono(id, _uidVerificado());
     await sessao.firestore.collection('itens').doc(id).delete();

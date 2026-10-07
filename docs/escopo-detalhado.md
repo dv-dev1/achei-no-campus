@@ -154,7 +154,7 @@ itens/{id}
 
 ### 6. Logo, ícone e splash (faltava)
 
-- Logo própria: lupa azul com estrela amarela (a estrela oficial da UNIPÊ é marca registrada).
+- Logo própria (a estrela oficial da UNIPÊ é marca registrada). A ideia inicial era uma lupa com estrela; a escolhida, em 06/10, foi um pino de localização com uma mochila (ver [`icone-e-splash.md`](icone-e-splash.md)).
 - Salvar em `assets/logo.png` e gerar o ícone com `flutter_launcher_icons`.
 - Splash com a logo.
 

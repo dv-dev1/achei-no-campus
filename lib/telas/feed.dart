@@ -68,7 +68,8 @@ class _TelaFeedState extends State<TelaFeed> {
   // Criado uma vez só. Se fosse criado dentro do build, cada redesenho
   // abriria uma nova conexão com o Firestore.
   late final Stream<List<Item>> _itens =
-      widget.itens ?? itensAbertosDoFirestore();
+      widget.itens ??
+      itensAbertosDoFirestore(firestore: widget.sessao?.firestore);
 
   // O que está filtrado e buscado agora. Fica aqui, e não na lista, para
   // continuar valendo quando o Firestore manda itens novos.

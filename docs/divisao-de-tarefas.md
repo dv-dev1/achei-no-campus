@@ -11,21 +11,21 @@ Função de cada um + o que estava sem dono (**faltava**).
 - [ ] Publicar item com foto real (Cloudinary ainda sem configuração)
 - [x] **faltava:** regras de segurança do Firestore e testes no emulador
 - [x] **faltava:** workflow de CI no GitHub Actions, sem credenciais reais
-- [ ] Conferir execução remota do CI após publicar a entrega
+- [x] Conferir execução remota do CI após publicar a entrega (verde na `main` desde 07/10)
 - [x] **faltava:** editar e apagar o próprio item
 - [ ] **faltava:** deploy web no Firebase Hosting
 - [ ] **faltava:** adicionar Cauê e Lúcio no repo
 
 ## Cauê (Full Stack)
 
-- [ ] Tema visual (cores e fonte da UNIPÊ)
-- [ ] Tela inicial com a lista de itens
-- [ ] Filtros (perdido/achado, categoria, local) e busca
-- [ ] Tela de detalhe com botão de contato
-- [ ] Marcar como devolvido
-- [ ] **faltava:** logo, ícone e splash
-- [ ] **faltava:** tela "Meus itens"
-- [ ] **faltava:** chat e aba de mensagens
+- [x] Tema visual (cores e fonte da UNIPÊ)
+- [x] Tela inicial com a lista de itens
+- [x] Filtros (perdido/achado, categoria, local) e busca
+- [x] Tela de detalhe com botão de contato
+- [x] Marcar como devolvido
+- [x] **faltava:** logo, ícone e splash
+- [x] **faltava:** tela "Meus itens"
+- [x] **faltava:** chat e aba de mensagens
 
 ## Lúcio (QA)
 

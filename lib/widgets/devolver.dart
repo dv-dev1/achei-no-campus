@@ -4,20 +4,19 @@
 // Usado no detalhe e em "Meus itens". Fica separado para os dois lugares
 // fazerem exatamente a mesma coisa.
 
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
+import '../itens.dart';
 import '../modelos/item.dart';
+import '../sessao.dart';
 
-/// Grava `status: "devolvido"` no item. As regras do Firestore só deixam o
-/// dono do item fazer isso.
+/// Grava `status: "devolvido"` no item, por `Itens.devolver`, que confere
+/// se quem pede é o dono (as regras do Firestore conferem de novo).
 ///
 /// Não precisa avisar o feed: ele só lista itens com `status == "aberto"`,
 /// então o item some sozinho da tela de todo mundo.
-Future<void> marcarComoDevolvido(String itemId) {
-  return FirebaseFirestore.instance.collection('itens').doc(itemId).update({
-    'status': 'devolvido',
-  });
+Future<void> marcarComoDevolvido(String itemId, {Sessao? sessao}) {
+  return Itens(sessao: sessao).devolver(itemId);
 }
 
 /// Mostra a confirmação e, se a pessoa confirmar, marca o item.
@@ -29,6 +28,7 @@ Future<void> marcarComoDevolvido(String itemId) {
 Future<bool> confirmarEDevolver(
   BuildContext context,
   Item item, {
+  Sessao? sessao,
   Future<void> Function(String itemId)? devolver,
 }) async {
   // Pega o mensageiro antes de qualquer espera: se a tela fechar no meio,
@@ -60,7 +60,9 @@ Future<bool> confirmarEDevolver(
   if (confirmou != true) return false;
 
   try {
-    await (devolver ?? marcarComoDevolvido)(item.id);
+    await (devolver ?? (id) => marcarComoDevolvido(id, sessao: sessao))(
+      item.id,
+    );
   } catch (_) {
     mensageiro.showSnackBar(
       const SnackBar(

@@ -1,9 +1,9 @@
 # Achei no Campus
 
-Achados e perdidos da UNIPÊ: cadastro acadêmico verificado, perfil e publicação, edição e exclusão dos próprios itens.
-App Flutter com Firebase local, integrado ao tema, feed, filtros, detalhe e devolução de Cauê. Projeto acadêmico, não oficial da UNIPÊ.
+Achados e perdidos da UNIPÊ: cadastro acadêmico verificado, perfil, publicação, edição e exclusão dos próprios itens, feed com filtros e busca, detalhe, marcar como devolvido, "Meus itens" e chat por item com contador de não lidas.
+App Flutter com Firebase local. Projeto acadêmico, não oficial da UNIPÊ. Cada parte tem um guia em [`docs/`](docs/).
 
-**Status:** primeira entrega local de Daniel. Web executável; Android/iOS têm scaffold e ainda precisam do aceite de Lúcio. Chat e Meus itens continuam com Cauê. Foto é opcional; upload real depende de configurar o Cloudinary. Escopo desta entrega em [`specs/2026-10-06-daniel-vieira.md`](specs/2026-10-06-daniel-vieira.md), decisões gerais em [`specs/2026-10-02-achei-no-campus.md`](specs/2026-10-02-achei-no-campus.md).
+**Status (07/10):** as entregas de código de Daniel e Cauê estão todas na `main` e conferidas juntas; o projeto entra na **fase de testes** com Lúcio. Web executável; Android/iOS têm scaffold e ainda precisam do aceite de Lúcio. Foto é opcional; upload real depende de configurar o Cloudinary. Escopo desta entrega em [`specs/2026-10-06-daniel-vieira.md`](specs/2026-10-06-daniel-vieira.md), decisões gerais em [`specs/2026-10-02-achei-no-campus.md`](specs/2026-10-02-achei-no-campus.md).
 
 ## Executar localmente
 
@@ -63,8 +63,8 @@ Pare a execução interativa dos emuladores antes de usar `emulators:exec`, para
 No issues found!
 All tests passed!
 ✓ Built build/web
-ℹ tests 21
-ℹ pass 21
+ℹ tests 26
+ℹ pass 26
 ℹ fail 0
 ```
 

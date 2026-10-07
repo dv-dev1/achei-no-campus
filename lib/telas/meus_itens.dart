@@ -1,7 +1,7 @@
 // Tela "Meus itens": tudo o que o usuário publicou, abertos e devolvidos.
 // Daqui ele marca um item como devolvido ou abre a edição.
 //
-// Abre pelo ícone na barra do topo do feed.
+// É a terceira aba da tela de início (lib/telas/inicio.dart).
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -13,6 +13,7 @@ import '../widgets/aviso.dart';
 import '../widgets/card_item.dart';
 import '../widgets/devolver.dart';
 import 'detalhe.dart';
+import 'publicar.dart';
 
 /// Itens publicados por `uid`, em tempo real.
 ///
@@ -155,8 +156,12 @@ class _TelaMeusItensState extends State<TelaMeusItens> {
         // Item devolvido não volta a ser devolvido.
         if (!item.devolvido)
           TextButton.icon(
-            onPressed: () =>
-                confirmarEDevolver(context, item, devolver: widget.devolver),
+            onPressed: () => confirmarEDevolver(
+              context,
+              item,
+              sessao: widget.sessao,
+              devolver: widget.devolver,
+            ),
             icon: const Icon(Icons.check_circle_outline),
             label: const Text('Marcar devolvido'),
           ),
@@ -164,11 +169,15 @@ class _TelaMeusItensState extends State<TelaMeusItens> {
     );
   }
 
+  // A mesma tela de publicar, já preenchida (a do Daniel, igual ao Editar
+  // do detalhe). Salvou, a lista se atualiza sozinha pelo Firestore.
   void _editar(Item item) {
-    // TODO(Daniel): abrir a tela de edição do item.
-    // Até ela existir, o botão só avisa, para não quebrar o app.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('A edição ainda está sendo feita.')),
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) =>
+            TelaPublicar(sessao: widget.sessao ?? Sessao(), item: item),
+      ),
     );
   }
 }
