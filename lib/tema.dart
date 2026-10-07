@@ -196,6 +196,13 @@ ThemeData temaAchei() {
       ),
     ),
 
+    // Linhas divisórias (detalhe, botões dos cards): cinza clara, para
+    // separar sem pesar.
+    dividerTheme: DividerThemeData(
+      color: CoresAchei.texto.withValues(alpha: 0.12),
+      thickness: 1,
+    ),
+
     progressIndicatorTheme: const ProgressIndicatorThemeData(
       color: CoresAchei.azul,
     ),

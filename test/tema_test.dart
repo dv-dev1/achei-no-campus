@@ -25,6 +25,10 @@ void main() {
     expect(tema.textTheme.titleLarge?.fontFamily, startsWith('WorkSans'));
   });
 
+  test('divisória é cinza clara, não preta', () {
+    expect(tema.dividerTheme.color, CoresAchei.texto.withValues(alpha: 0.12));
+  });
+
   test('card tem raio 12', () {
     final formato = tema.cardTheme.shape as RoundedRectangleBorder;
     expect(formato.borderRadius, BorderRadius.circular(12));

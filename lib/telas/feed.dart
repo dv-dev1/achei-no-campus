@@ -13,9 +13,11 @@ import 'package:flutter/material.dart';
 import '../modelos/item.dart';
 import '../sessao.dart';
 import '../util/filtro.dart';
+import '../widgets/aviso.dart';
 import '../widgets/barra_de_filtros.dart';
 import '../widgets/card_item.dart';
 import 'detalhe.dart';
+import 'meus_itens.dart';
 
 /// Quantos itens o feed carrega no máximo (definido na spec).
 const int limiteDoFeed = 200;
@@ -45,6 +47,7 @@ class TelaFeed extends StatefulWidget {
     this.uidDoUsuario,
     this.devolver,
     this.sessao,
+    this.meusItens,
   });
 
   final Sessao? sessao;
@@ -58,6 +61,9 @@ class TelaFeed extends StatefulWidget {
 
   /// Repassado ao detalhe, para os testes não gravarem no Firestore.
   final Future<void> Function(String itemId)? devolver;
+
+  /// Repassado a "Meus itens", para os testes não lerem do Firestore.
+  final Stream<List<Item>>? meusItens;
 
   @override
   State<TelaFeed> createState() => _TelaFeedState();
@@ -108,6 +114,20 @@ class _TelaFeedState extends State<TelaFeed> {
         title: const Text('Achei no Campus'),
         actions: [
           IconButton(
+            tooltip: 'Meus itens',
+            icon: const Icon(Icons.inventory_2_outlined),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => TelaMeusItens(
+                  uidDoUsuario: widget.uidDoUsuario,
+                  itens: widget.meusItens,
+                  devolver: widget.devolver,
+                ),
+              ),
+            ),
+          ),
+          IconButton(
             tooltip: 'Perfil',
             icon: const Icon(Icons.person_outline),
             onPressed: () => Navigator.pushNamed(context, '/perfil'),
@@ -125,7 +145,7 @@ class _TelaFeedState extends State<TelaFeed> {
         stream: _itens,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const _Aviso(
+            return const Aviso(
               icone: Icons.cloud_off,
               texto:
                   'Não foi possível carregar os itens.\n'
@@ -139,7 +159,7 @@ class _TelaFeedState extends State<TelaFeed> {
 
           final itens = snapshot.data!;
           if (itens.isEmpty) {
-            return const _Aviso(
+            return const Aviso(
               icone: Icons.search,
               texto:
                   'Nenhum item ainda.\n'
@@ -161,7 +181,7 @@ class _TelaFeedState extends State<TelaFeed> {
               ),
               Expanded(
                 child: visiveis.isEmpty
-                    ? _Aviso(
+                    ? Aviso(
                         icone: Icons.filter_alt_off,
                         texto: 'Nenhum item com esses filtros.',
                         acao: OutlinedButton(
@@ -183,40 +203,6 @@ class _TelaFeedState extends State<TelaFeed> {
             ],
           );
         },
-      ),
-    );
-  }
-}
-
-/// Mensagem centralizada com ícone, para os estados de vazio e de erro.
-/// `acao` é um botão opcional embaixo do texto.
-class _Aviso extends StatelessWidget {
-  const _Aviso({required this.icone, required this.texto, this.acao});
-
-  final IconData icone;
-  final String texto;
-  final Widget? acao;
-
-  @override
-  Widget build(BuildContext context) {
-    final cores = Theme.of(context).colorScheme;
-
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icone, size: 48, color: cores.primary),
-            const SizedBox(height: 12),
-            Text(
-              texto,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            if (acao != null) ...[const SizedBox(height: 16), acao!],
-          ],
-        ),
       ),
     );
   }

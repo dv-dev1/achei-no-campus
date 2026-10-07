@@ -4,14 +4,14 @@ Quando o objeto volta para o dono, quem publicou o item marca ele como **devolvi
 
 ## Como funciona para quem usa
 
-1. O dono do item abre o detalhe. No rodapé, no lugar do **Conversar**, aparece **Marcar como devolvido**.
+1. O dono do item abre o detalhe. No rodapé, no lugar do **Conversar**, aparece **Marcar como devolvido**. Em "Meus itens", o mesmo botão aparece embaixo de cada card aberto, como **Marcar devolvido** (ver [`meus-itens.md`](meus-itens.md)).
 2. Ao tocar, o app pergunta antes: *"Marcar como devolvido? 'Chave do carro' vai sair do feed para todo mundo. Confirme só quando o objeto já estiver com o dono."*
 3. **Cancelar**, ou tocar fora da janela, não muda nada.
 4. Confirmado, o app grava, volta ao feed e mostra o aviso **"Item marcado como devolvido."**. O item já não está mais lá.
 
 Se der erro (sem internet, por exemplo), aparece "Não foi possível marcar. Confira a conexão e tente de novo." e a pessoa continua no detalhe, podendo tentar outra vez.
 
-Um item já devolvido, quando aberto (a partir de "Meus itens", na task 7), mostra a faixa amarela **"Este item já foi devolvido."** e nenhum botão no rodapé.
+Um item já devolvido, quando aberto a partir de "Meus itens", mostra a faixa amarela **"Este item já foi devolvido."** e nenhum botão no rodapé.
 
 ## Quem pode marcar
 
@@ -34,7 +34,7 @@ Ninguém precisa avisar o feed. Ele está escutando os itens com `status == "abe
 | `lib/widgets/devolver.dart` | `marcarComoDevolvido` (grava no Firestore) e `confirmarEDevolver` (pergunta, grava e mostra o aviso) |
 | `lib/telas/detalhe.dart` | Escolhe o botão do rodapé e mostra a faixa de devolvido |
 
-`confirmarEDevolver` fica fora da tela de propósito: **"Meus itens" (task 7) vai usar a mesma função**, para os dois lugares perguntarem e avisarem do mesmo jeito. Ela devolve `true` quando o item foi marcado, para cada tela decidir o que fazer depois (o detalhe volta ao feed).
+`confirmarEDevolver` fica fora da tela de propósito: **"Meus itens" usa a mesma função**, para os dois lugares perguntarem e avisarem do mesmo jeito. Ela devolve `true` quando o item foi marcado, para cada tela decidir o que fazer depois (o detalhe volta ao feed).
 
 ## Testes
 

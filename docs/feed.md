@@ -100,3 +100,4 @@ O teste de tempo real usa um `StreamController` no lugar do Firestore: ele manda
 
 - **Filtros e busca:** já estão no topo desta tela. Ver [`filtros.md`](filtros.md).
 - **Detalhe:** tocar num card abre a tela de detalhe. Ver [`detalhe.md`](detalhe.md).
+- **Meus itens:** o ícone de caixa na barra do topo abre a lista do que o usuário publicou. Ver [`meus-itens.md`](meus-itens.md).

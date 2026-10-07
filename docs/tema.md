@@ -61,6 +61,7 @@ Use os widgets do Flutter sem passar cor, fonte nem formato. O tema já cuida di
 | `NavigationBar(...)` | Barra de abas branca, aba ativa marcada em amarelo |
 | `Badge(label: Text('3'), child: Icon(Icons.chat))` | Contador amarelo com número azul |
 | `SnackBar(content: Text('Item devolvido'))` | Aviso azul flutuante |
+| `Divider()` | Linha cinza clara, que separa sem pesar |
 
 ### Quando precisar de uma cor específica
 
