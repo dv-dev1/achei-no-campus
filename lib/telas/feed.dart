@@ -11,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../modelos/item.dart';
+import '../sessao.dart';
 import '../util/filtro.dart';
 import '../widgets/barra_de_filtros.dart';
 import '../widgets/card_item.dart';
@@ -23,8 +24,8 @@ const int limiteDoFeed = 200;
 ///
 /// Atenção: filtrar por `status` e ordenar por `criadoEm` exige um índice
 /// composto no Firestore. Ver docs/feed.md.
-Stream<List<Item>> itensAbertosDoFirestore() {
-  return FirebaseFirestore.instance
+Stream<List<Item>> itensAbertosDoFirestore({FirebaseFirestore? firestore}) {
+  return (firestore ?? FirebaseFirestore.instance)
       .collection('itens')
       .where('status', isEqualTo: 'aberto')
       .orderBy('criadoEm', descending: true)
@@ -38,7 +39,15 @@ Stream<List<Item>> itensAbertosDoFirestore() {
 }
 
 class TelaFeed extends StatefulWidget {
-  const TelaFeed({super.key, this.itens, this.uidDoUsuario, this.devolver});
+  const TelaFeed({
+    super.key,
+    this.itens,
+    this.uidDoUsuario,
+    this.devolver,
+    this.sessao,
+  });
+
+  final Sessao? sessao;
 
   /// De onde vêm os itens. Se ficar nulo, usa o Firestore.
   final Stream<List<Item>>? itens;
@@ -79,6 +88,7 @@ class _TelaFeedState extends State<TelaFeed> {
           item: item,
           uidDoUsuario: widget.uidDoUsuario,
           devolver: widget.devolver,
+          sessao: widget.sessao,
         ),
       ),
     );
@@ -94,7 +104,16 @@ class _TelaFeedState extends State<TelaFeed> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Achei no Campus')),
+      appBar: AppBar(
+        title: const Text('Achei no Campus'),
+        actions: [
+          IconButton(
+            tooltip: 'Perfil',
+            icon: const Icon(Icons.person_outline),
+            onPressed: () => Navigator.pushNamed(context, '/perfil'),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton.extended(
         // A rota '/publicar' é registrada no main.dart, apontando para a
         // tela de publicar do Daniel.

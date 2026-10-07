@@ -11,6 +11,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../modelos/item.dart';
+import '../itens.dart';
+import '../sessao.dart';
+import 'publicar.dart';
 import '../util/tempo.dart';
 import '../widgets/card_item.dart';
 import '../widgets/devolver.dart';
@@ -21,9 +24,11 @@ class TelaDetalhe extends StatelessWidget {
     required this.item,
     this.uidDoUsuario,
     this.devolver,
+    this.sessao,
   });
 
   final Item item;
+  final Sessao? sessao;
 
   /// Quem está usando o app. Se ficar nulo, pergunta ao Firebase Auth.
   /// Os testes passam um valor aqui para não depender do Firebase.
@@ -43,6 +48,20 @@ class TelaDetalhe extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(item.perdido ? 'Item perdido' : 'Item achado'),
+        actions: souOAutor
+            ? [
+                IconButton(
+                  tooltip: 'Editar item',
+                  icon: const Icon(Icons.edit_outlined),
+                  onPressed: () => _editar(context),
+                ),
+                IconButton(
+                  tooltip: 'Apagar item',
+                  icon: const Icon(Icons.delete_outline),
+                  onPressed: () => _apagar(context),
+                ),
+              ]
+            : null,
       ),
       body: ListView(
         padding: const EdgeInsets.only(bottom: 24),
@@ -136,6 +155,52 @@ class TelaDetalhe extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('O chat ainda está sendo feito.')),
     );
+  }
+
+  Future<void> _editar(BuildContext context) async {
+    final mudou = await Navigator.push<bool>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TelaPublicar(sessao: sessao ?? Sessao(), item: item),
+      ),
+    );
+    if (mudou == true && context.mounted) Navigator.pop(context);
+  }
+
+  Future<void> _apagar(BuildContext context) async {
+    final confirmou = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Apagar item?'),
+        content: Text(
+          '"${item.titulo}" será removido. Esta ação não pode ser desfeita.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Apagar'),
+          ),
+        ],
+      ),
+    );
+    if (confirmou != true || !context.mounted) return;
+    try {
+      await Itens(sessao: sessao).apagar(item.id);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(const SnackBar(content: Text('Item apagado.')));
+        Navigator.pop(context);
+      }
+    } catch (erro) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(mensagemDeErro(erro))));
+      }
+    }
   }
 }
 

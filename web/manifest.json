@@ -1,11 +1,11 @@
 {
-    "name": "achei_no_campus",
-    "short_name": "achei_no_campus",
+    "name": "Achei no Campus",
+    "short_name": "Achei no Campus",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#F7F7F7",
+    "theme_color": "#003B71",
+    "description": "Achados e perdidos da UNIPÊ.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
