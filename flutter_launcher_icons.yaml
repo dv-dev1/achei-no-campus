@@ -1,0 +1,21 @@
+# Ícone do app. Para gerar de novo depois de trocar a imagem:
+#   dart run flutter_launcher_icons
+# Guia: docs/icone-e-splash.md
+flutter_launcher_icons:
+  # iOS e web: ícone quadrado com o fundo cinza-claro do app.
+  image_path: "assets/icone.png"
+  ios: true
+  remove_alpha_ios: true # a App Store não aceita ícone transparente
+
+  # Android: ícone adaptativo. O celular recorta em círculo, gota ou
+  # quadrado; a logo fica no meio, dentro da área que nunca é cortada.
+  android: true
+  adaptive_icon_background: "#F7F7F7"
+  adaptive_icon_foreground: "assets/icone_adaptativo.png"
+  min_sdk_android: 21
+
+  web:
+    generate: true
+    image_path: "assets/icone.png"
+    background_color: "#F7F7F7"
+    theme_color: "#003B71"

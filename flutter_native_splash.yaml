@@ -1,0 +1,16 @@
+# Tela de abertura (splash). Para gerar de novo depois de trocar a imagem:
+#   dart run flutter_native_splash:create
+# Guia: docs/icone-e-splash.md
+flutter_native_splash:
+  color: "#F7F7F7" # o mesmo fundo das telas do app
+  image: assets/logo.png
+
+  # No Android 12 ou mais novo, o sistema mostra o ícone num círculo no
+  # meio da tela; por isso usa a versão com folga em volta.
+  android_12:
+    image: assets/icone_adaptativo.png
+    color: "#F7F7F7"
+
+  android: true
+  ios: true
+  web: true
