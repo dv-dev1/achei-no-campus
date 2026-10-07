@@ -43,3 +43,11 @@ Verificação: `flutter test`, esperado `All tests passed!`.
 Criar GitHub Actions com Flutter, Node e JDK 21, análise, testes, build web e emuladores sem credenciais reais. Atualizar README e divisão de tarefas com o escopo efetivamente entregue. Executar todos os comandos da spec e o fluxo no Chrome. Registrar resultados e limitações reais, convergir intenção com diff e preservar worktree para entrega local.
 
 Verificação: comandos e aceite manual da spec.
+
+## Decisões na execução
+
+- Tasks 3 e 4 formam um único commit de implementação: o registro das rotas no app depende das telas de perfil e publicação, mantendo o commit executável.
+- Fontes Work Sans incluídas com licença; `google_fonts` 6.3.3 mantém compatibilidade com o tema de Cauê.
+- Localização Material `pt_BR` preserva idioma nos menus, contadores e navegação nativa.
+- A recarga no Chrome expôs FlutterFire #11534: Auth restaura a sessão antes de conectar o emulador. `web/firebase_local.js` conecta pelo SDK público antes de `Firebase.initializeApp`, usando as opções de Dart. Teste de recarga executa o build real, preserva o usuário e rejeita requisições a Firebase real; também roda no CI.
+- CI usa Ubuntu 24.04, Flutter 3.47.6, Node.js 22 e JDK 21. Nenhum deploy ou credencial real.

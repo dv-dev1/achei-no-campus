@@ -4,13 +4,15 @@ Função de cada um + o que estava sem dono (**faltava**).
 
 ## Daniel (Full Stack)
 
-- [ ] Projeto Flutter + Firebase
-- [ ] Login e cadastro (`@cs.unipe.edu.br`, com verificação de e-mail)
-- [ ] Perfil e sair
-- [ ] Publicar item com foto (Firestore + Cloudinary)
-- [ ] **faltava:** regras de segurança do Firestore e testes
-- [ ] **faltava:** CI no GitHub Actions
-- [ ] **faltava:** editar e apagar o próprio item
+- [x] Projeto Flutter + Firebase local (Android/iOS/web; build verificado na web)
+- [x] Login e cadastro (`@cs.unipe.edu.br`, com verificação pelo emulador)
+- [x] Perfil e sair
+- [x] Publicar sem foto; editar pelo mesmo formulário e preparar upload por bytes
+- [ ] Publicar item com foto real (Cloudinary ainda sem configuração)
+- [x] **faltava:** regras de segurança do Firestore e testes no emulador
+- [x] **faltava:** workflow de CI no GitHub Actions, sem credenciais reais
+- [ ] Conferir execução remota do CI após publicar a entrega
+- [x] **faltava:** editar e apagar o próprio item
 - [ ] **faltava:** deploy web no Firebase Hosting
 - [ ] **faltava:** adicionar Cauê e Lúcio no repo
 
