@@ -10,9 +10,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../modelos/conversa.dart';
 import '../modelos/item.dart';
 import '../itens.dart';
 import '../sessao.dart';
+import 'conversa.dart';
 import 'publicar.dart';
 import '../util/tempo.dart';
 import '../widgets/card_item.dart';
@@ -114,11 +116,11 @@ class TelaDetalhe extends StatelessWidget {
           ),
         ],
       ),
-      bottomNavigationBar: _botaoDoRodape(context, souOAutor),
+      bottomNavigationBar: _botaoDoRodape(context, souOAutor, uid),
     );
   }
 
-  Widget? _botaoDoRodape(BuildContext context, bool souOAutor) {
+  Widget? _botaoDoRodape(BuildContext context, bool souOAutor, String? uid) {
     // Item devolvido já foi resolvido: não há mais o que fazer com ele.
     if (item.devolvido) return null;
 
@@ -130,7 +132,7 @@ class TelaDetalhe extends StatelessWidget {
             label: const Text('Marcar como devolvido'),
           )
         : FilledButton.icon(
-            onPressed: () => _conversar(context),
+            onPressed: uid == null ? null : () => _conversar(context, uid),
             icon: const Icon(Icons.chat_bubble_outline),
             label: const Text('Conversar'),
           );
@@ -149,11 +151,17 @@ class TelaDetalhe extends StatelessWidget {
     if (marcou && context.mounted) Navigator.pop(context);
   }
 
-  void _conversar(BuildContext context) {
-    // TODO(task 8): abrir a tela da conversa sobre este item.
-    // Até o chat ficar pronto, o botão só avisa, para não quebrar o app.
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('O chat ainda está sendo feito.')),
+  void _conversar(BuildContext context, String uid) {
+    // A conversa pode ainda não existir: ela nasce na primeira mensagem.
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => TelaConversa(
+          conversa: Conversa.nova(item, uid),
+          tituloDoItem: item.titulo,
+          sessao: sessao,
+        ),
+      ),
     );
   }
 

@@ -17,7 +17,6 @@ import '../widgets/aviso.dart';
 import '../widgets/barra_de_filtros.dart';
 import '../widgets/card_item.dart';
 import 'detalhe.dart';
-import 'meus_itens.dart';
 
 /// Quantos itens o feed carrega no máximo (definido na spec).
 const int limiteDoFeed = 200;
@@ -47,7 +46,6 @@ class TelaFeed extends StatefulWidget {
     this.uidDoUsuario,
     this.devolver,
     this.sessao,
-    this.meusItens,
   });
 
   final Sessao? sessao;
@@ -61,9 +59,6 @@ class TelaFeed extends StatefulWidget {
 
   /// Repassado ao detalhe, para os testes não gravarem no Firestore.
   final Future<void> Function(String itemId)? devolver;
-
-  /// Repassado a "Meus itens", para os testes não lerem do Firestore.
-  final Stream<List<Item>>? meusItens;
 
   @override
   State<TelaFeed> createState() => _TelaFeedState();
@@ -113,20 +108,6 @@ class _TelaFeedState extends State<TelaFeed> {
       appBar: AppBar(
         title: const Text('Achei no Campus'),
         actions: [
-          IconButton(
-            tooltip: 'Meus itens',
-            icon: const Icon(Icons.inventory_2_outlined),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => TelaMeusItens(
-                  uidDoUsuario: widget.uidDoUsuario,
-                  itens: widget.meusItens,
-                  devolver: widget.devolver,
-                ),
-              ),
-            ),
-          ),
           IconButton(
             tooltip: 'Perfil',
             icon: const Icon(Icons.person_outline),

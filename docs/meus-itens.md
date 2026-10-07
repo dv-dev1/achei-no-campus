@@ -4,7 +4,7 @@
 
 ## Como chegar
 
-Pelo ícone de caixa (📦) no canto direito da barra do topo do feed. Quando a barra de abas entrar, na task 8 (Feed / Mensagens), dá para mover "Meus itens" para lá.
+Pela aba **Meus itens**, a terceira da barra de baixo (Feed, Mensagens, Meus itens). Até a task 8 ela era um ícone no topo do feed.
 
 ## O que aparece
 
@@ -35,7 +35,7 @@ Três escolhas que valem explicar:
 
 ## O botão Editar, por enquanto
 
-A tela de edição é tarefa do Daniel ("Editar e apagar"). Até ela existir, **Editar** só mostra o aviso "A edição ainda está sendo feita.". O ponto a trocar está marcado com `TODO(Daniel)` em `lib/telas/meus_itens.dart`, no método `_editar`.
+Por enquanto, **Editar** só mostra o aviso "A edição ainda está sendo feita.". A tela de edição já existe: o Daniel entregou em 06/10 (`TelaPublicar` com o item), e ela abre pelo ícone de editar no topo do detalhe. Falta ligar este botão a ela. O ponto a trocar está marcado com `TODO(Daniel)` em `lib/telas/meus_itens.dart`, no método `_editar`.
 
 ## Onde está cada coisa
 
@@ -45,7 +45,7 @@ A tela de edição é tarefa do Daniel ("Editar e apagar"). Até ela existir, **
 | `lib/widgets/card_item.dart` | O card, agora com `mostrarStatus`, `botoes` e a `EtiquetaStatus` |
 | `lib/widgets/devolver.dart` | A confirmação de devolvido, a mesma do detalhe |
 | `lib/widgets/aviso.dart` | A mensagem de vazio ou de erro, compartilhada com o feed |
-| `lib/telas/feed.dart` | O ícone que abre esta tela |
+| `lib/telas/inicio.dart` | A barra de abas, onde esta tela é a terceira aba |
 
 ## Testes
 
@@ -62,6 +62,5 @@ flutter test test/meus_itens_test.dart
 | **critério de pronto:** marcado aqui, aparece como devolvido | Com um Firestore de mentira, a etiqueta troca de Aberto para Devolvido |
 | sem itens | O aviso aparece |
 | Editar | Mostra o aviso provisório |
-| o ícone do feed abre Meus itens | A navegação a partir do feed |
 
 Com esta tela, a task 5 ("Marcar como devolvido") também fecha a outra metade do seu critério de pronto: o item aparece como devolvido em "Meus itens".

@@ -2,7 +2,7 @@
   "name": "achei-no-campus-firestore-tests",
   "private": true,
   "type": "module",
-  "scripts": {"test": "node --test rules.test.js", "test:web": "node --test web.test.js"},
+  "scripts": {"test": "node --test --test-concurrency=1 rules.test.js chat.test.js", "test:web": "node --test web.test.js"},
   "devDependencies": {
     "@firebase/rules-unit-testing": "5.0.2",
     "firebase": "12.19.0",

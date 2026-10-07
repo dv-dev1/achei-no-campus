@@ -6,7 +6,7 @@ import 'config.dart';
 import 'firebase_local.dart';
 import 'sessao.dart';
 import 'telas/entrar.dart';
-import 'telas/feed.dart';
+import 'telas/inicio.dart';
 import 'telas/perfil.dart';
 import 'telas/publicar.dart';
 import 'tema.dart';
@@ -150,14 +150,8 @@ class _PortaoState extends State<_Portao> {
         if (snapshot.data != true) {
           return TelaVerificar(sessao: widget.sessao, aoVerificar: _verificar);
         }
-        return widget.destino?.call() ??
-            TelaFeed(
-              sessao: widget.sessao,
-              uidDoUsuario: widget.sessao.usuario!.uid,
-              itens: itensAbertosDoFirestore(
-                firestore: widget.sessao.firestore,
-              ),
-            );
+        // Logado e verificado: abre as abas (Feed, Mensagens, Meus itens).
+        return widget.destino?.call() ?? TelaInicio(sessao: widget.sessao);
       },
     );
   }

@@ -24,53 +24,16 @@ O feed é a primeira tela depois do login. Ele mostra os itens perdidos e achado
 
 Cada card mostra a foto (ou um ícone, se não houver foto ou o link falhar), a etiqueta (amarela para **Perdido**, azul para **Achado**), o título, a categoria e o local, e há quanto tempo foi publicado.
 
-## O que falta ligar (Daniel)
+## Como o feed se liga ao resto do app
 
-O feed já está pronto, mas depende de três coisas da base:
+A base do Daniel (06/10) já ligou tudo o que o feed precisava:
 
-**1. Pacotes no `pubspec.yaml`:**
+- **Pacotes:** `cloud_firestore` e companhia estão no `pubspec.yaml`.
+- **Rota de publicar:** o botão **Publicar** abre a rota `/publicar`, registrada no `onGenerateRoute` do `main.dart`.
+- **Onde o feed aparece:** é a primeira aba da tela de início (`lib/telas/inicio.dart`), que o portão do login abre depois que o e-mail é verificado. Ver [`chat.md`](chat.md#a-barra-de-abas).
+- **Índice composto:** filtrar por `status` e ordenar por `criadoEm` exige um índice, que já está versionado em `firestore.indexes.json`. Os emuladores não precisam dele, mas o Firebase de verdade sim. Quando o app for para lá, suba com `firebase deploy --only firestore:indexes`. Sem o índice, o feed cai no estado de erro e o console mostra `FAILED_PRECONDITION: The query requires an index`.
 
-```bash
-flutter pub add cloud_firestore
-```
-
-**2. A rota de publicar.** O botão **Publicar** abre a rota `/publicar`. Basta registrar no `MaterialApp` do `main.dart`:
-
-```dart
-MaterialApp(
-  theme: temaAchei(),
-  routes: {
-    '/publicar': (context) => const TelaPublicar(),
-  },
-  ...
-);
-```
-
-E, no portão do login, o usuário logado e verificado vai para `const TelaFeed()`.
-
-**3. O índice do Firestore.** Filtrar por `status` e ao mesmo tempo ordenar por `criadoEm` exige um **índice composto**. Sem ele, o feed cai no estado de erro, e o console mostra `FAILED_PRECONDITION: The query requires an index`, com um link. Dá para resolver de dois jeitos:
-
-- clicar no link do erro, que abre o console do Firebase com o índice já preenchido; ou
-- deixar o índice versionado no repo, em `firestore.indexes.json`, e subir com `firebase deploy --only firestore:indexes`:
-
-```json
-{
-  "indexes": [
-    {
-      "collectionGroup": "itens",
-      "queryScope": "COLLECTION",
-      "fields": [
-        { "fieldPath": "status", "order": "ASCENDING" },
-        { "fieldPath": "criadoEm", "order": "DESCENDING" }
-      ]
-    }
-  ]
-}
-```
-
-O segundo jeito é melhor, porque o índice fica registrado e ninguém precisa lembrar de criar de novo.
-
-**Sobre o modelo do item:** o escopo coloca o modelo na tarefa do Daniel. Como o feed não anda sem ele, criei `lib/modelos/item.dart` seguindo os campos da spec. Daniel, fique à vontade para assumir e ajustar; se mudar o nome de algum campo, os testes em `test/item_test.dart` avisam o que quebrou.
+**Sobre o modelo do item:** `lib/modelos/item.dart` foi criado junto com o feed, seguindo os campos da spec, e a base do Daniel usa o mesmo modelo.
 
 ## Como ver o feed sem o Firebase
 
@@ -100,4 +63,5 @@ O teste de tempo real usa um `StreamController` no lugar do Firestore: ele manda
 
 - **Filtros e busca:** já estão no topo desta tela. Ver [`filtros.md`](filtros.md).
 - **Detalhe:** tocar num card abre a tela de detalhe. Ver [`detalhe.md`](detalhe.md).
-- **Meus itens:** o ícone de caixa na barra do topo abre a lista do que o usuário publicou. Ver [`meus-itens.md`](meus-itens.md).
+- **Meus itens:** fica na aba ao lado. Ver [`meus-itens.md`](meus-itens.md).
+- **Perfil:** o ícone de pessoa no topo abre o perfil (tela do Daniel).

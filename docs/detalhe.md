@@ -31,17 +31,13 @@ Para saber quem está usando o app, a tela pergunta ao Firebase Auth (`FirebaseA
 
 Nos testes não há Firebase, então a tela aceita esse dado pronto pelo parâmetro `uidDoUsuario`. O feed repassa o mesmo parâmetro quando abre o detalhe. No app de verdade ninguém precisa passar nada.
 
-## O botão Conversar, por enquanto
+## O botão Conversar
 
-O chat é a task 8, que ainda não foi feita. Até lá, tocar em **Conversar** só mostra o aviso "O chat ainda está sendo feito.", para o app não quebrar durante os testes. O ponto a trocar está marcado no código com `TODO(task 8)`, em `lib/telas/detalhe.dart`.
+Abre a conversa com quem publicou, sobre este item. Se for a primeira vez, a conversa nasce na primeira mensagem. Ver [`chat.md`](chat.md).
 
-## O que falta ligar (Daniel)
+## Editar e apagar
 
-```bash
-flutter pub add firebase_auth
-```
-
-Provavelmente já vai estar no projeto por causa do login.
+Para quem publicou, a barra do topo também tem os ícones **Editar** e **Apagar**. Essa parte é do Daniel (`lib/itens.dart` e `lib/telas/publicar.dart`).
 
 ## Onde está cada coisa
 

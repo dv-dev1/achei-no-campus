@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:achei_no_campus/modelos/item.dart';
-import 'package:achei_no_campus/telas/feed.dart';
 import 'package:achei_no_campus/telas/meus_itens.dart';
 import 'package:achei_no_campus/tema.dart';
 import 'package:flutter/material.dart';
@@ -158,25 +157,5 @@ void main() {
     await tester.pump();
 
     expect(find.text('A edição ainda está sendo feita.'), findsOneWidget);
-  });
-
-  testWidgets('o ícone do feed abre Meus itens', (tester) async {
-    telaAlta(tester);
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: temaAchei(),
-        home: TelaFeed(
-          itens: Stream.value([]),
-          uidDoUsuario: 'ana',
-          meusItens: Stream.value([item('1', 'Fone da Ana', autor: 'ana')]),
-        ),
-      ),
-    );
-
-    await tester.tap(find.byTooltip('Meus itens'));
-    await tester.pumpAndSettle();
-
-    expect(find.byType(TelaMeusItens), findsOneWidget);
-    expect(find.text('Fone da Ana'), findsOneWidget);
   });
 }

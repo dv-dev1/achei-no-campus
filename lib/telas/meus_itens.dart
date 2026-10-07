@@ -8,6 +8,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 import '../modelos/item.dart';
+import '../sessao.dart';
 import '../widgets/aviso.dart';
 import '../widgets/card_item.dart';
 import '../widgets/devolver.dart';
@@ -18,8 +19,11 @@ import 'detalhe.dart';
 /// A consulta só filtra por autor e não ordena: assim o Firestore não pede
 /// índice composto. A ordem é feita no app, por `ordenarMeusItens`, o que
 /// sai barato porque cada pessoa publica poucos itens.
-Stream<List<Item>> meusItensDoFirestore(String uid) {
-  return FirebaseFirestore.instance
+Stream<List<Item>> meusItensDoFirestore(
+  String uid, {
+  FirebaseFirestore? firestore,
+}) {
+  return (firestore ?? FirebaseFirestore.instance)
       .collection('itens')
       .where('autorId', isEqualTo: uid)
       .snapshots()
@@ -42,6 +46,7 @@ List<Item> ordenarMeusItens(List<Item> itens) {
 class TelaMeusItens extends StatefulWidget {
   const TelaMeusItens({
     super.key,
+    this.sessao,
     this.uidDoUsuario,
     this.itens,
     this.devolver,
@@ -49,6 +54,9 @@ class TelaMeusItens extends StatefulWidget {
 
   /// Quem está usando o app. Se ficar nulo, pergunta ao Firebase Auth.
   final String? uidDoUsuario;
+
+  /// A sessão do app (Firebase e usuário). Se ficar nula, usa o padrão.
+  final Sessao? sessao;
 
   /// De onde vêm os itens. Se ficar nulo, usa o Firestore.
   /// Este e o `devolver` só existem para os testes.
@@ -61,11 +69,16 @@ class TelaMeusItens extends StatefulWidget {
 
 class _TelaMeusItensState extends State<TelaMeusItens> {
   late final String? _uid =
-      widget.uidDoUsuario ?? FirebaseAuth.instance.currentUser?.uid;
+      widget.uidDoUsuario ??
+      widget.sessao?.usuario?.uid ??
+      FirebaseAuth.instance.currentUser?.uid;
 
   // Criado uma vez só, como no feed.
   late final Stream<List<Item>>? _itens =
-      widget.itens ?? (_uid == null ? null : meusItensDoFirestore(_uid));
+      widget.itens ??
+      (_uid == null
+          ? null
+          : meusItensDoFirestore(_uid, firestore: widget.sessao?.firestore));
 
   @override
   Widget build(BuildContext context) {
@@ -127,6 +140,7 @@ class _TelaMeusItensState extends State<TelaMeusItens> {
         MaterialPageRoute(
           builder: (_) => TelaDetalhe(
             item: item,
+            sessao: widget.sessao,
             uidDoUsuario: _uid,
             devolver: widget.devolver,
           ),

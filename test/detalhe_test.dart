@@ -52,12 +52,8 @@ void main() {
   testWidgets('outra pessoa vê o botão Conversar', (tester) async {
     await abrirDetalhe(tester, uid: 'bruno');
 
+    // O que acontece ao tocar está em chat_telas_test.dart.
     expect(find.text('Conversar'), findsOneWidget);
-
-    // Enquanto o chat (task 8) não existe, o botão só avisa.
-    await tester.tap(find.text('Conversar'));
-    await tester.pump();
-    expect(find.text('O chat ainda está sendo feito.'), findsOneWidget);
   });
 
   testWidgets('o autor não vê o botão Conversar', (tester) async {
