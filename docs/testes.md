@@ -23,7 +23,7 @@ Todas as funcionalidades entregues por Daniel e por Cauê:
 
 | Plataforma | Como | Observação |
 |---|---|---|
-| Web | `flutter run -d chrome` | Com os emuladores de Auth e Firestore ligados. |
+| Web | `flutter run -d chrome` | Com os emuladores de Auth e Firestore ligados. Sem Chrome instalado, use `-d edge`: o `web.test.js` aceita `CHROME_BIN`. |
 | Android (emulador) | `flutter run -d emulator-5554` | O app encontra o host sozinho, em `10.0.2.2`. |
 | Android (celular real) | `flutter build apk --debug` | **Precisa** de `--dart-define=EMULATOR_HOST=<IP da máquina na rede>`. Sem isso o APK tenta `10.0.2.2`, que não existe fora do emulador, e o app abre direto na tela "Não foi possível iniciar o app". |
 | iOS (simulador) | `flutter run -d <simulador>` | Depende de um Mac com Xcode. |
@@ -45,9 +45,10 @@ como verificado, e depois tocando em **Já verifiquei** no app.
 
 | Comando | O que cobre | Última execução |
 |---|---|---|
-| `flutter analyze` | Lint e tipos | 08/10/2026 — `No issues found!` |
-| `flutter test` | 82 testes de unidade e de widget | 08/10/2026 — `All tests passed!` |
-| `npm test` em `firestore-tests/` | Regras do Firestore no emulador | Verde no CI de 07/10/2026 |
+| `flutter analyze` | Lint e tipos | 13/10/2026 — `No issues found!` |
+| `flutter test` | 82 testes de unidade e de widget | 13/10/2026 — `All tests passed!` |
+| `npm test` em `firestore-tests/` | Regras do Firestore no emulador | 13/10/2026 — 26 testes, `pass 26` |
+| `npm run test:web` em `firestore-tests/` | Sessão do build web sobrevive ao recarregar | 13/10/2026 — `pass 1`, com `CHROME_BIN` apontando para o Edge |
 
 O caso de teste manual existe para o que o teste automatizado **não** vê:
 câmera, galeria, teclado, rolagem, troca de aparelho e texto na tela.
@@ -417,3 +418,50 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 
 **Esperado:** nenhum ❌ em aberto, ou os restantes listados como defeitos conhecidos.
 **Obtido:** ⏳
+
+---
+
+## 3. Registro de execução
+
+### Rodada de 13/10/2026
+
+- Commit: `740cae0`
+- Máquina: Windows 10 (19045), Flutter 3.47.6 (stable), Node v24.15.0
+- Aparelhos que o Flutter encontrou: `Edge (web)` e `Windows (desktop)`
+
+O que foi executado e o resultado exato:
+
+```
+flutter analyze                     No issues found!
+flutter test                        All tests passed!  (82)
+flutter build web                   Built build\web
+npm test (firestore-tests)          tests 26 · pass 26 · fail 0
+npm run test:web (firestore-tests)  tests 1 · pass 1 · fail 0
+```
+
+As linhas `PERMISSION_DENIED` que aparecem durante `npm test` são o resultado
+esperado dos casos negativos das regras, não falhas.
+
+Isto fecha CT-39, CT-40 e CT-41 e mantém verde a parte automatizada citada em
+CT-02 e CT-43.
+
+### O que ficou sem executar, e por quê
+
+| Plataforma | Situação | Motivo |
+|---|---|---|
+| Web (Chrome) | ⏳ | Chrome não está instalado nesta máquina. O Edge roda o mesmo motor e serve de substituto, mas o caso pede Chrome. |
+| Android | ⏳ | `flutter emulators` responde `Unable to find any emulator sources`: não há AVD, e não há celular ligado. |
+| iOS | ➖ | Depende de um Mac com Xcode, que não existe neste ambiente. Já estava fora de escopo no `spec.md`. |
+
+Os CT-01 a CT-38, CT-42, CT-44 e CT-45 continuam `⏳`: todos dependem de toque,
+câmera, galeria, teclado ou de dois aparelhos ao mesmo tempo. Para destravá-los
+falta, nesta ordem: um AVD Android instalado, e o Chrome para a coluna **W**.
+
+### Defeitos registrados
+
+| Issue | Sintoma | Severidade | Responsável | Estado |
+|---|---|---|---|---|
+| [#2](https://github.com/dv-dev1/achei-no-campus/issues/2) | `npm run test:web` falha com `ENOENT` em máquina Windows sem Chrome no caminho padrão | baixa | Daniel | aberta |
+
+Nenhum defeito de produto foi encontrado nesta rodada: o único achado é no
+ambiente de teste.
