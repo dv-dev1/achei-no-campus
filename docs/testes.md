@@ -48,6 +48,7 @@ como verificado, e depois tocando em **Já verifiquei** no app.
 | `flutter analyze` | Lint e tipos | 13/10/2026 — `No issues found!` |
 | `flutter test` | 82 testes de unidade e de widget | 13/10/2026 — `All tests passed!` |
 | `npm test` em `firestore-tests/` | Regras do Firestore no emulador | 13/10/2026 — 26 testes, `pass 26` |
+| `npm run test:ct` em `firestore-tests/` | Os casos de teste da coluna W, dirigindo o navegador | 13/10/2026 — 28 casos, `pass 24` e `todo 4` |
 | `npm run test:web` em `firestore-tests/` | Sessão do build web sobrevive ao recarregar | 13/10/2026 — `pass 1`, com `CHROME_BIN` apontando para o Edge |
 
 O caso de teste manual existe para o que o teste automatizado **não** vê:
@@ -87,7 +88,7 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 3. Tocar em **Criar conta**.
 
 **Esperado:** a conta é criada e o app mostra a tela "verifique seu e-mail", com o botão **Reenviar**.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-02 — Cadastro com e-mail fora do domínio
 
@@ -95,14 +96,14 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. Tocar em **Criar conta**.
 
 **Esperado:** a própria tela recusa, com a mensagem `Use seu e-mail @cs.unipe.edu.br.`, e nenhuma conta é criada no emulador de Auth.
-**Obtido:** W ⏳ · A ⏳ · I ⏳ — a validação em si já é coberta por `test/config_test.dart` (✅).
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-03 — Domínio parecido não passa
 
 1. Informar `lucio@cs.unipe.edu.br.evil.com`.
 
 **Esperado:** recusado na tela.
-**Obtido:** ✅ (automatizado, `test/config_test.dart`).
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-04 — Entrar sem verificar o e-mail
 
@@ -110,7 +111,7 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. Fechar e abrir o app.
 
 **Esperado:** o app para na tela "verifique seu e-mail"; o feed não aparece.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-05 — Entrar depois de verificar
 
@@ -118,21 +119,21 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. Tocar em **Já verifiquei** no app.
 
 **Esperado:** o app chama `reload()` e `getIdToken(true)`, cria `usuarios/{uid}` e abre o feed.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-06 — Senha curta
 
 1. Informar uma senha com 5 caracteres.
 
 **Esperado:** `Use pelo menos 6 caracteres.`, sem chamada ao Firebase.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-07 — Senha errada ao entrar
 
 1. Entrar com um e-mail existente e a senha errada.
 
 **Esperado:** `E-mail ou senha incorretos.` — nunca o código cru do Firebase.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### Perfil e sair
 
@@ -142,21 +143,21 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. Trocar o nome para `Lúcio Testador` e o curso para `Ciência da Computação`; tocar em **Salvar perfil**.
 
 **Esperado:** aviso `Perfil atualizado.`; ao reabrir a tela, os valores novos continuam lá.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-09 — Nome novo vale no próximo item publicado
 
 1. Depois do CT-08, publicar um item.
 
 **Esperado:** o item aparece com `Publicado por Lúcio Testador`. Itens antigos **mantêm** o nome antigo, como combinado na spec.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-10 — Sair
 
 1. No perfil, tocar em **Sair**.
 
 **Esperado:** volta para a tela de entrar; o botão voltar do aparelho não devolve ao feed.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### Publicar
 
@@ -166,21 +167,21 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. Tocar em **Publicar item**.
 
 **Esperado:** aviso `Item publicado.`, a tela fecha e o item aparece no topo do feed sem recarregar.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-12 — Campos obrigatórios
 
 1. Tocar em **Publicar item** com tudo vazio.
 
 **Esperado:** três mensagens embaixo dos campos: `Informe o título.`, `Escolha a categoria.` e `Escolha o local.`
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-13 — Aviso de LGPD na categoria Documentos
 
 1. Na tela de publicar, escolher a categoria `Documentos`.
 
 **Esperado:** aparece `Cubra CPF/RG na foto antes de publicar.` logo abaixo do campo, e some ao trocar de categoria.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-14 — Foto pela galeria
 
@@ -213,14 +214,14 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. Publicar um item pelo A.
 
 **Esperado:** o item aparece no feed de B em poucos segundos, **sem recarregar a página**.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-18 — Feed vazio
 
 1. Apagar todos os itens abertos e abrir o feed.
 
 **Esperado:** `Nenhum item ainda. Perdeu ou achou algo? Toque em Publicar.`
-**Obtido:** ✅ (automatizado, `test/feed_test.dart`) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-19 — Filtros combinados
 
@@ -228,14 +229,14 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. Escolher a categoria `Eletrônicos` e o local `Biblioteca`.
 
 **Esperado:** só os itens que atendem aos três ao mesmo tempo ficam na lista, e o botão **Limpar** aparece.
-**Obtido:** ✅ (automatizado, `test/filtros_feed_test.dart`) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-20 — Busca sem diferenciar acento e maiúscula
 
 1. Com um item de título `ÓCULOS de grau`, digitar `oculos` na busca.
 
 **Esperado:** o item continua na lista.
-**Obtido:** ✅ (verificado em 08/10/2026).
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-21 — Busca com mais de uma palavra
 
@@ -249,14 +250,14 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 1. Com filtro e busca ligados, tocar em **Limpar**.
 
 **Esperado:** os chips voltam para `Todos`, o campo de busca esvazia e a lista inteira volta.
-**Obtido:** ✅ (automatizado) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-23 — Filtro sem resultado
 
 1. Escolher uma combinação que não existe no feed.
 
 **Esperado:** `Nenhum item com esses filtros.` com o botão **Limpar filtros**.
-**Obtido:** ✅ (automatizado) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### Detalhe
 
@@ -265,21 +266,21 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 1. Tocar num card do feed.
 
 **Esperado:** foto grande, tipo, título, descrição, categoria, local, data no formato `08/10/2026 às 14:30 (há 2 h)` e o nome de quem publicou.
-**Obtido:** ✅ (automatizado, `test/detalhe_test.dart`) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-25 — Botão Conversar não aparece para o autor
 
 1. Abrir o detalhe de um item **seu**.
 
 **Esperado:** no rodapé aparece **Marcar como devolvido**, nunca **Conversar**; no topo, os ícones de editar e apagar.
-**Obtido:** ✅ (automatizado) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-26 — Item sem foto
 
 1. Abrir o detalhe de um item publicado sem foto.
 
 **Esperado:** um ícone grande no lugar da foto, sem erro e sem espaço quebrado.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### Chat e mensagens
 
@@ -289,7 +290,7 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. Escrever `Achei na Biblioteca, posso entregar amanhã` e enviar.
 
 **Esperado:** a mensagem aparece à direita, em azul, e a conversa passa a existir no Firestore com o ID `{itemId}_{uidDoB}`.
-**Obtido:** ✅ (automatizado, `test/chat_telas_test.dart`) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ❌ — a conversa fica no indicador de carregamento para sempre depois da primeira mensagem; a mensagem é gravada e aparece ao recarregar. Issue [#3](https://github.com/dv-dev1/achei-no-campus/issues/3). · A ⏳ · I ⏳
 
 ### CT-28 — Conversa em tempo real entre dois aparelhos
 
@@ -297,21 +298,21 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. B envia uma mensagem.
 
 **Esperado:** a mensagem aparece no aparelho de A em poucos segundos, sem recarregar.
-**Obtido:** W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ❌ — a conversa fica no indicador de carregamento para sempre depois da primeira mensagem; a mensagem é gravada e aparece ao recarregar. Issue [#3](https://github.com/dv-dev1/achei-no-campus/issues/3). · A ⏳ · I ⏳
 
 ### CT-29 — Contador de não lidas sobe
 
 1. B envia mensagem com A **fora** da conversa.
 
 **Esperado:** a aba **Mensagens** de A mostra o número `1`, e a conversa aparece na lista com a última mensagem e a hora.
-**Obtido:** ✅ (automatizado) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ❌ — a conversa fica no indicador de carregamento para sempre depois da primeira mensagem; a mensagem é gravada e aparece ao recarregar. Issue [#3](https://github.com/dv-dev1/achei-no-campus/issues/3). · A ⏳ · I ⏳
 
 ### CT-30 — Contador zera ao abrir
 
 1. A abre a conversa do CT-29.
 
 **Esperado:** o número some da aba e continua zerado ao reabrir o app.
-**Obtido:** ✅ (automatizado) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ❌ — a conversa fica no indicador de carregamento para sempre depois da primeira mensagem; a mensagem é gravada e aparece ao recarregar. Issue [#3](https://github.com/dv-dev1/achei-no-campus/issues/3). · A ⏳ · I ⏳
 
 ### CT-31 — Terceiro não lê a conversa
 
@@ -325,7 +326,7 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 1. Tocar em enviar com o campo vazio ou só com espaços.
 
 **Esperado:** nada é enviado e nenhuma mensagem em branco aparece.
-**Obtido:** ✅ (automatizado) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### Devolvido, Meus itens, editar e apagar
 
@@ -334,42 +335,42 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 1. No detalhe de um item seu, tocar em **Marcar como devolvido** e confirmar.
 
 **Esperado:** aviso `Item marcado como devolvido.`, a tela volta ao feed e o item some do feed **de todos**.
-**Obtido:** ✅ (automatizado, `test/devolver_test.dart`) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-34 — Cancelar a confirmação
 
 1. Tocar em **Marcar como devolvido** e depois em **Cancelar**.
 
 **Esperado:** nada muda e o item continua aberto.
-**Obtido:** ✅ (automatizado) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-35 — Meus itens mostra só os meus
 
 1. Com itens de A e de B no banco, abrir a aba **Meus itens** com o usuário A.
 
 **Esperado:** só os itens de A, abertos primeiro e devolvidos depois, com a etiqueta de status.
-**Obtido:** ✅ (automatizado, `test/meus_itens_test.dart`) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-36 — Editar o próprio item
 
 1. Em **Meus itens**, tocar em **Editar**, trocar o título e salvar.
 
 **Esperado:** a tela abre já preenchida; depois de salvar, o título novo aparece no feed e no detalhe.
-**Obtido:** ✅ (automatizado, `test/fluxo_daniel_test.dart`) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-37 — Apagar o próprio item
 
 1. No detalhe de um item seu, tocar no ícone de lixeira e confirmar.
 
 **Esperado:** aviso `Item apagado.`; o item some do feed e de Meus itens.
-**Obtido:** ✅ (automatizado) · W ⏳ · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### CT-38 — Outro usuário não edita nem apaga
 
 1. Com o usuário B, abrir o detalhe de um item de A.
 
 **Esperado:** nenhum ícone de editar ou apagar no topo. Pela API, a regra responde `PERMISSION_DENIED`.
-**Obtido:** ✅ (automatizado, `firestore-tests/rules.test.js`).
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
 ### Segurança (regras do Firestore)
 
@@ -461,7 +462,37 @@ falta, nesta ordem: um AVD Android instalado, e o Chrome para a coluna **W**.
 
 | Issue | Sintoma | Severidade | Responsável | Estado |
 |---|---|---|---|---|
+| [#3](https://github.com/dv-dev1/achei-no-campus/issues/3) | A conversa fica carregando para sempre depois da primeira mensagem | alta | Cauê | aberta |
+| [#4](https://github.com/dv-dev1/achei-no-campus/issues/4) | Busca com duas palavras não encontra o item | média | Cauê | aberta |
 | [#2](https://github.com/dv-dev1/achei-no-campus/issues/2) | `npm run test:web` falha com `ENOENT` em máquina Windows sem Chrome no caminho padrão | baixa | Daniel | aberta |
 
-Nenhum defeito de produto foi encontrado nesta rodada: o único achado é no
-ambiente de teste.
+A #4 é o defeito que o CT-21 já descrevia sem issue aberta; agora tem número e
+é rastreável. Nenhuma issue é fechada antes do reteste pelo QA.
+
+
+### Rodada de 13/10/2026 — coluna W pelo navegador
+
+Os casos da coluna **W** passaram a ser executados de verdade, dirigindo o
+navegador pelo CDP contra o `build/web` e os emuladores. O `driver.mjs` fala com
+a árvore de semantics do Flutter, que é o único DOM que o CanvasKit expõe, e
+cada caso vira um `test` com o código do CT no nome.
+
+```bash
+cd firestore-tests && npm ci
+cd .. && flutter build web
+cd firestore-tests
+npx --no-install firebase emulators:exec --config ../firebase.json   --project demo-achei-no-campus --only auth,firestore "npm run test:ct"
+```
+
+Sem Chrome na máquina, aponte outro navegador Chromium antes do comando:
+`CHROME_BIN="C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"`.
+
+Resultado: `tests 28 · pass 24 · fail 0 · todo 4`. Os quatro `todo` são os casos
+que reproduzem as issues #3 e #4 — ficam fora do vermelho do CI de propósito,
+para que uma falha nova continue significando regressão nova. Quando a correção
+chegar, tirar o `todo` e rodar de novo: é esse o reteste.
+
+O que o navegador **não** cobre, e por isso segue manual: foto pela galeria e
+pela câmera (CT-14, CT-15, CT-16), o terceiro que não lê a conversa (CT-31, já
+coberto por `firestore-tests/chat.test.js`), e tudo que depende de toque em
+aparelho real (coluna A) ou de ir ao campus (CT-44).
