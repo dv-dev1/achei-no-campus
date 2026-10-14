@@ -496,3 +496,50 @@ O que o navegador **não** cobre, e por isso segue manual: foto pela galeria e
 pela câmera (CT-14, CT-15, CT-16), o terceiro que não lê a conversa (CT-31, já
 coberto por `firestore-tests/chat.test.js`), e tudo que depende de toque em
 aparelho real (coluna A) ou de ir ao campus (CT-44).
+## 4. Próximos passos por responsável
+
+Entrega da fase de testes para a correção. O QA não corrige: registra, acompanha
+e reteste. Cada item abaixo tem o caso de teste que o prova e o comando que o roda.
+
+### Cauê
+
+| Issue | Sintoma | Casos | Reteste |
+|---|---|---|---|
+| [#3](https://github.com/dv-dev1/achei-no-campus/issues/3) | A conversa fica no indicador de carregamento para sempre depois da primeira mensagem; a mensagem é gravada e aparece ao recarregar. | CT-27, CT-28, CT-29, CT-30 | `npm run test:ct` |
+| [#4](https://github.com/dv-dev1/achei-no-campus/issues/4) | Busca com duas palavras não encontra o item: o texto digitado é tratado como um pedaço só. | CT-21 | `npm run test:ct` |
+
+### Daniel
+
+| Issue | Sintoma | Casos | Reteste |
+|---|---|---|---|
+| [#2](https://github.com/dv-dev1/achei-no-campus/issues/2) | `npm run test:web` falha com `ENOENT` em máquina Windows sem Chrome no caminho padrão. | CT-39 | `npm run test:web` |
+
+### Como rodar o reteste
+
+```bash
+cd firestore-tests && npm ci
+cd .. && flutter build web
+cd firestore-tests
+npx --no-install firebase emulators:exec --config ../firebase.json \
+  --project demo-achei-no-campus --only auth,firestore "npm run test:ct"
+```
+
+Os cinco casos das issues #3 e #4 estão marcados como `todo` em
+`firestore-tests/web-ct.test.js`, para que uma falha vermelha no CI continue
+significando regressão nova. **Depois de corrigir, tire o `todo` do caso e rode
+o comando acima**: é essa execução que fecha a issue. Quem corrige não fecha a
+issue; o QA confirma e fecha.
+
+### Pendências que não são defeito
+
+Dependem de ambiente, não de código. Ficam registradas para não parecerem esquecidas.
+
+| Pendência | Destrava com |
+|---|---|
+| Coluna **A** (Android): CT-01 a CT-38, CT-42, CT-45 | um AVD instalado, ou um celular ligado via USB |
+| Coluna **W** em Chrome de verdade (rodou em Edge por `CHROME_BIN`) | Chrome instalado na máquina de teste |
+| CT-14, CT-15, CT-16 — foto por galeria, câmera e acima de 2 MB | Cloudinary configurado; os três seguem manuais |
+| CT-43 — textos, acentos e tema | inspeção visual nas duas plataformas |
+| CT-44 — lista de locais bate com o campus | ir ao campus |
+| Coluna **I** (iOS) | Mac com Xcode; já estava fora de escopo |
+| Revisar `docs/requisitos.md` e `docs/diagramas/` | os documentos ainda não existem |
