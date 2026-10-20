@@ -43,9 +43,27 @@ O emulador Android usa `10.0.2.2`; web e simulador iOS usam `127.0.0.1`. Para ou
 
 ## Fotos
 
-Sem Cloudinary configurado, publique sem foto. Selecionar uma foto e tentar enviar mostra o motivo e permite removê-la. Ao editar, uma foto existente fica preservada até ser removida ou substituída. O formulário aceita até 2 MB e avisa para cobrir CPF/RG na categoria Documentos.
+As fotos ficam no Cloudinary (plano grátis), porque o Firebase Storage exige o plano pago. O app envia a foto direto para o Cloudinary e grava só o link (`fotoUrl`) no Firestore.
 
-`enviarFoto(XFile)` usa bytes e multipart, compatíveis com web. A configuração futura usa `CLOUDINARY_CLOUD_NAME` e `CLOUDINARY_UPLOAD_PRESET` via `--dart-define`. O preset unsigned deve restringir formatos, tamanho e pasta. Esta entrega testa HTTP simulado; não faz upload real.
+| Configuração | Valor |
+| --- | --- |
+| Cloud name | `tbeq7obd` |
+| Upload preset | `achei_unsigned` (unsigned) |
+
+Os dois valores não são segredo: o preset unsigned é público por natureza, e a proteção são as restrições dele. O preset `achei_unsigned` aceita só `jpg`, `png` e `webp`, reduz para no máximo 1280 px (`c_limit,w_1280,h_1280`), guarda tudo na pasta `achei` (o link sai como `res.cloudinary.com/tbeq7obd/image/upload/.../achei/...`), gera um nome aleatório e ignora um `public_id` enviado por quem faz o upload, então ninguém sobrescreve a foto de outra pessoa.
+
+Para rodar ou buildar **com foto**, passe os dois valores:
+
+```bash
+flutter run -d chrome --dart-define=CLOUDINARY_CLOUD_NAME=tbeq7obd --dart-define=CLOUDINARY_UPLOAD_PRESET=achei_unsigned
+flutter build web --dart-define=CLOUDINARY_CLOUD_NAME=tbeq7obd --dart-define=CLOUDINARY_UPLOAD_PRESET=achei_unsigned
+```
+
+Sem eles o app continua funcionando, mas sem foto: selecionar uma foto e tentar enviar mostra o motivo e permite removê-la. Os testes automatizados (`flutter test`, `test:web`, `test:ct` e o CI) rodam sem esses valores e sem rede: `enviarFoto(XFile)` (`lib/cloudinary.dart`) é testado com HTTP simulado.
+
+Ao editar, uma foto existente fica preservada até ser removida ou substituída. O formulário avisa para cobrir CPF/RG na categoria Documentos.
+
+**Limite de 2 MB:** o Cloudinary não tem limite de tamanho por preset (um envio direto de 3 MB ao preset é aceito). Os 2 MB são garantidos pelo app (`limiteFotoBytes` em `lib/config.dart`), que recusa a foto com "A foto deve ter no máximo 2 MB." antes de enviar.
 
 ## Verificação
 
