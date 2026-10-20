@@ -59,6 +59,10 @@ void main() {
     expect(find.text('Reenviar verificação'), findsOneWidget);
     expect(find.text('Achei no Campus'), findsNothing);
     expect((await firestore.collection('usuarios').get()).docs, isEmpty);
+
+    await tester.tap(find.text('Já verifiquei'));
+    await tester.pumpAndSettle();
+    expect(find.text('Verifique seu e-mail'), findsOneWidget);
   });
 
   testWidgets('login recusa domínio externo sem autenticar', (tester) async {

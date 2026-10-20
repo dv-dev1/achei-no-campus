@@ -92,7 +92,9 @@ class _Portao extends StatefulWidget {
 class _PortaoState extends State<_Portao> {
   late Future<bool> _acesso = widget.sessao.prepararAcesso();
 
-  void _verificar() => setState(() => _acesso = widget.sessao.prepararAcesso());
+  void _verificar() => setState(() {
+    _acesso = widget.sessao.prepararAcesso();
+  });
 
   @override
   Widget build(BuildContext context) {
