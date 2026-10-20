@@ -34,6 +34,8 @@ jobs:
         working-directory: firestore-tests
       - run: npx --no-install firebase emulators:exec --config ../firebase.json --project demo-achei-no-campus --only auth,firestore "npm run test:web"
         working-directory: firestore-tests
+      - run: npx --no-install firebase emulators:exec --config ../firebase.json --project demo-achei-no-campus --only auth,firestore "npm run test:ct"
+        working-directory: firestore-tests
 
   firestore:
     runs-on: ubuntu-24.04
