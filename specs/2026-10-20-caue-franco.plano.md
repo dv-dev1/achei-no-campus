@@ -42,10 +42,12 @@ depois que a conversa existe". O código conferia a existência pelo cache local
 - Commits pequenos, um assunto cada, mensagem em pt-BR, autor `cauedev30 <cauefranco01@gmail.com>`,
   sem Co-Authored-By. No comando com `git commit`, usar `cd "C:/Users/Administrator/Desktop/achei-no-campus"`,
   nunca `/c/...`.
-- **Push e comentário em issue só com o aval do Cauê**, no ponto de parada de cada etapa.
+- **Push só com o aval do Cauê**, no ponto de parada de cada etapa. **Sem comentário nas
+  issues** (decisão do Cauê em 20/10): o que iria no comentário fica na seção "Registro da
+  execução", no fim deste plano, e sobe no mesmo push.
   Quem corrige não fecha a issue: o Lúcio retesta e fecha (`docs/testes.md`, seção 4).
 - Teste novo falha antes da correção (TDD). Os casos `todo` de `web-ct.test.js` são o reteste.
-- `docs/testes.md` é do Lúcio: os resultados vão no comentário da issue, não nesse arquivo.
+- `docs/testes.md` é do Lúcio: os resultados vão no "Registro da execução", não nesse arquivo.
 
 Comandos de verificação (a partir da raiz do clone; em `firestore-tests/` para os `npm`):
 
@@ -262,7 +264,7 @@ O V5 exige o V3 antes, porque o `driver.mjs` serve o `build/web`. O Chrome está
   gerar os SVG e a versão do PlantUML usada.
 - **Commit:** `docs: README aponta requisitos e diagramas`.
 
-**⏸ Ponto de parada da etapa 3.** No comentário da #8, avisar o Lúcio que a #9 está liberada.
+**⏸ Ponto de parada da etapa 3.** No registro da execução, avisar o Lúcio que a #9 está liberada.
 
 ---
 
@@ -314,7 +316,7 @@ O V5 exige o V3 antes, porque o `driver.mjs` serve o `build/web`. O Chrome está
   Tirar a frase "Esta entrega testa HTTP simulado; não faz upload real".
 - **Commit:** `docs: README registra o Cloudinary do projeto (#6)`.
 
-**⏸ Ponto de parada da etapa 4.** No comentário da #6, mandar os valores para o Daniel usar na #5, #7 e #11.
+**⏸ Ponto de parada da etapa 4.** No registro da execução, deixar os valores para o Daniel usar na #5, #7 e #11.
 
 ---
 
@@ -323,31 +325,116 @@ O V5 exige o V3 antes, porque o `driver.mjs` serve o `build/web`. O Chrome está
 1. Rodar de novo o que a etapa pede (V1–V5) e mostrar a saída ao Cauê.
 2. **Pedir o aval** para o push. Com o aval, `git fetch`: se a `main` andou, rebase e repetir o
    passo 1. Depois, `git push origin main`.
-3. **Pedir o aval** para o comentário na issue, com o texto pronto: o commit, a saída do
-   `test:ct`, o que fica para o reteste do Lúcio e o que fica pendente. Na etapa 1, avisar o
-   Daniel que a #14 vai ver `todo 1` (depois `todo 0`), e não mais `todo 4`.
+3. Registrar a etapa em "Registro da execução": os commits, a saída do `test:ct`, o que fica
+   para o reteste do Lúcio e o que fica pendente, com o responsável.
 4. Só então começar a etapa seguinte.
 
 ## Checklist
 
-- [ ] 0.1 Clone atualizado e base medida (V5 = `pass 24 · todo 4`)
-- [ ] 0.2 Plano em `specs/2026-10-20-caue-franco.plano.md`
-- [ ] 1.1 Causa da #3 confirmada (`permission-denied`)
-- [ ] 1.2 Teste da regra de mensagens antes da conversa
-- [ ] 1.3 Ramo de erro das mensagens com "Tentar de novo"
-- [ ] 1.4 Conversa nova espera o servidor; CT-27 a CT-30 sem `todo`
-- [ ] 1.5 `docs/chat.md` atualizado
-- [ ] ⏸ Etapa 1: push e comentário na #3 (com aval)
-- [ ] 2.1 Busca por várias palavras; CT-21 sem `todo`
-- [ ] 2.2 `docs/filtros.md` atualizado
-- [ ] ⏸ Etapa 2: push e comentário na #4 (com aval)
+- [x] 0.1 Clone atualizado e base medida (V5 = `pass 24 · todo 4`)
+- [x] 0.2 Plano em `specs/2026-10-20-caue-franco.plano.md`
+- [x] 1.1 Causa da #3 confirmada (`permission-denied`)
+- [x] 1.2 Teste da regra de mensagens antes da conversa
+- [x] 1.3 Ramo de erro das mensagens com "Tentar de novo"
+- [x] 1.4 Conversa nova espera o servidor; CT-27 sem `todo` (CT-28 e CT-29/30: ver o registro)
+- [x] 1.5 `docs/chat.md` atualizado
+- [x] ⏸ Etapa 1: push e registro (#3)
+- [x] 2.1 Busca por várias palavras; CT-21 sem `todo`
+- [x] 2.2 `docs/filtros.md` atualizado
+- [x] ⏸ Etapa 2: push e registro (#4)
 - [ ] 3.1 PlantUML instalado e determinístico
 - [ ] 3.2 `docs/requisitos.md`
 - [ ] 3.3 Quatro diagramas `.puml` + `.svg`
 - [ ] 3.4 README com os links
-- [ ] ⏸ Etapa 3: push e comentário na #8 (com aval)
+- [ ] ⏸ Etapa 3: push e registro (#8)
 - [ ] 4.1 Conta e preset do Cloudinary
 - [ ] 4.2 Preset conferido na API
 - [ ] 4.3 CT-14 e CT-16 na web
 - [ ] 4.4 README "Fotos"
-- [ ] ⏸ Etapa 4: push e comentário na #6 (com aval)
+- [ ] ⏸ Etapa 4: push e registro (#6)
+
+## Registro da execução
+
+Máquina: Windows 10, Flutter 3.47.6, Node 24, JDK 21, Chrome 155.
+
+### Etapa 0 — base (20/10/2026)
+
+A base em `56886de` deu `test:ct` com `pass 23 · fail 1 · todo 4`, e não `pass 24` como na
+rodada do Lúcio. O CT-26 falhava: em tela larga a foto 4:3 do detalhe passava da altura da
+janela e escondia o título. O Daniel corrigiu isso em `b8a3eb9` no mesmo dia (altura máxima
+de 400 px); a correção paralela do Cauê foi descartada no rebase.
+
+### Etapa 1 — #3, conversa carregando para sempre
+
+Commits: `77dcc41` (teste da regra), `29ffe11` (erro das mensagens na tela), `99b7646`
+(correção) e `6f39942` (guia). CI do push: `success`.
+
+**Causa confirmada:** na primeira mensagem, logo depois do `set`, a conversa já aparecia em
+`Conversas.minhas()` pela gravação local, antes de o servidor confirmar. A tela escutava
+`conversas/{id}/mensagens` nesse instante e a regra negava a leitura, porque no servidor a
+conversa ainda não existia:
+
+```text
+[cloud_firestore/permission-denied]
+evaluation error at L91:24 for 'list' @ L91, Null value error.
+```
+
+O `StreamBuilder` das mensagens não tinha ramo de erro, então ficava no carregando. A
+suspeita do `criadoEm` nulo não se confirmou.
+
+**Correção:** `lib/telas/conversa.dart` espera o `enviar` da primeira mensagem voltar antes de
+escutar as mensagens. Erro no stream agora mostra "Não foi possível carregar as mensagens."
+com **Tentar de novo**. O porquê está em `docs/chat.md`.
+
+**Resultado em `6f39942`:** `flutter test` 82 verdes · `npm test` `pass 30 · fail 0` · CT-27 ✔.
+
+**Para o Lúcio (reteste e fechamento da #3):** o CT-27 saiu do `todo`. O CT-28 e o CT-29/30
+continuam `todo`: o app já faz o que eles pedem, mas o roteiro trava em passos que nunca
+tinham sido executados, porque antes o teste parava no defeito.
+
+1. Com não lidas, o rótulo da aba é `1\nMensagens` (número e nome juntos), então
+   `tocar('Mensagens')` e `esperarRotulo('1')` não acham por igualdade exata.
+2. No CT-29/30, `tocar('Feed')` roda com a conversa aberta por cima das abas; falta voltar.
+
+Com este ajuste em `firestore-tests/web-ct.test.js`, os três passaram:
+
+```diff
+ // CT-28
+-  await dono.tocar('Mensagens');
++  await dono.tocarContendo('Mensagens');
+
+ // CT-29 e CT-30
+-  await dono.esperarRotulo('1');
+-  await dono.tocar('Mensagens');
++  await dono.esperarRotulo('1\nMensagens');
++  await dono.tocarContendo('Mensagens');
+   await dono.tocarContendo('Fone branco');
+   await dono.esperarTexto('E meu fone');
++  await dono.tocar('Voltar');
+   await dono.tocar('Feed');
+-  await esperarSem(dono, '1');
++  await esperarSem(dono, '1\nMensagens');
++  await dono.esperarRotulo('Mensagens');
+```
+
+O motivo escrito no `todo` desses dois casos ainda cita o defeito da #3.
+
+### Etapa 2 — #4, busca com várias palavras
+
+Commits: `bb8528f` (correção, CT-21 sem `todo`) e `bbeaedf` (guia).
+
+`Filtro.aceita` (`lib/util/filtro.dart`) quebra a busca em palavras; cada uma precisa aparecer
+no título ou na descrição, em qualquer ordem. `garrafa prata` acha "Garrafa térmica prata".
+
+**Resultado:** `flutter test` 83 verdes · `npm run test:ct` `tests 28 · pass 26 · fail 0 · todo 2`
+(os dois `todo` são o CT-28 e o CT-29/30 da etapa 1).
+
+**Para o Lúcio:** reteste e fechamento da #4.
+
+### Pendências de outras pessoas
+
+| Quem | O quê |
+|---|---|
+| Lúcio | Ajustar o roteiro do CT-28 e do CT-29/30 (acima); retestar e fechar a #3 e a #4 |
+| Daniel | O CI do `d7f7a17` (a #14) ficou mais de 2h30 "em andamento"; o do `6f39942`, logo depois, terminou em 9 min. Vale cancelar o travado |
+| Daniel | Com a #3 e a #4, o `test:ct` do CI passa de `todo 4` para `todo 2` |
