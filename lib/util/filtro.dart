@@ -38,10 +38,14 @@ class Filtro {
     if (categoria != null && item.categoria != categoria) return false;
     if (local != null && item.local != local) return false;
 
-    final termo = normalizar(busca.trim());
-    if (termo.isEmpty) return true;
-    return normalizar(item.titulo).contains(termo) ||
-        normalizar(item.descricao).contains(termo);
+    // Cada palavra digitada precisa aparecer no título ou na descrição, em
+    // qualquer ordem: "garrafa prata" acha "Garrafa térmica prata".
+    final palavras = normalizar(busca)
+        .split(RegExp(r'\s+'))
+        .where((palavra) => palavra.isNotEmpty);
+    if (palavras.isEmpty) return true;
+    final texto = '${normalizar(item.titulo)} ${normalizar(item.descricao)}';
+    return palavras.every(texto.contains);
   }
 
   List<Item> aplicar(List<Item> itens) => itens.where(aceita).toList();

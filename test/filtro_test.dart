@@ -68,6 +68,19 @@ void main() {
     expect(ids((Filtro()..busca = 'carregador').aplicar(itens)), ['4']);
   });
 
+  test(
+    'busca com várias palavras: todas precisam aparecer, em qualquer ordem',
+    () {
+      // Uma no título e outra na descrição ("FÔNE", com acento).
+      expect(ids((Filtro()..busca = 'carregador fone').aplicar(itens)), ['4']);
+      expect(ids((Filtro()..busca = 'fone azul').aplicar(itens)), ['3']);
+      expect(ids((Filtro()..busca = 'azul fone').aplicar(itens)), ['3']);
+      expect(ids((Filtro()..busca = 'fone   azul').aplicar(itens)), ['3']);
+      // Uma palavra que não aparece derruba o item.
+      expect(ids((Filtro()..busca = 'fone verde').aplicar(itens)), isEmpty);
+    },
+  );
+
   test('cada filtro sozinho', () {
     expect(ids((Filtro()..tipo = 'perdido').aplicar(itens)), ['2']);
     expect(ids((Filtro()..local = 'Ginásio').aplicar(itens)), ['3']);

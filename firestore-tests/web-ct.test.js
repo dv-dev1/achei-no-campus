@@ -221,11 +221,9 @@ test('CT-20 — busca ignora acento e maiúscula', { timeout: 180000 }, () => co
   assert.ok(!(await app.tem('Guarda-chuva preto')), 'a busca não filtrou');
 }));
 
-// Este caso reproduz um defeito conhecido do produto: `Filtro.aceita` procura o
-// texto digitado inteiro com `contains`, então duas palavras separadas no título
-// não casam (issue #4). Fica como `todo` para o CI não ficar vermelho por um
-// defeito já registrado, e volta a valer quando a correção chegar.
-test('CT-21 — busca com mais de uma palavra', { timeout: 180000, todo: 'defeito #4: busca trata o texto digitado como um pedaço só' }, () => comApp(async (app) => {
+// Reteste da issue #4: antes, `Filtro.aceita` procurava o texto digitado inteiro
+// com `contains`, e duas palavras separadas no título não casavam.
+test('CT-21 — busca com mais de uma palavra', { timeout: 180000 }, () => comApp(async (app) => {
   await limparBanco();
   await entrarVerificado(app, email('ct21'));
   await publicar(app, { titulo: 'Garrafa térmica prata', descricao: 'Fica na portaria' });
