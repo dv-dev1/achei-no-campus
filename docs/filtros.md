@@ -6,7 +6,7 @@ No topo do feed fica uma barra para achar um item rápido, sem rolar a lista int
 
 | Parte | Como funciona |
 | --- | --- |
-| **Busca** | Procura no título e na descrição. Não diferencia maiúsculas nem acentos: `termica`, `Térmica` e `TÉRMICA` acham a mesma garrafa. O **×** apaga o texto. |
+| **Busca** | Procura no título e na descrição. Não diferencia maiúsculas nem acentos: `termica`, `Térmica` e `TÉRMICA` acham a mesma garrafa. Com várias palavras, todas precisam aparecer, em qualquer ordem e em qualquer dos dois campos: `garrafa prata` acha "Garrafa térmica prata", e `carregador fone` acha um carregador com "fone" na descrição. O **×** apaga o texto. |
 | **Todos / Perdidos / Achados** | Escolha única. Começa em Todos. |
 | **Categoria ▾** | Abre uma lista embaixo da tela. Escolhida a categoria, o chip fica marcado e mostra o nome dela. "Todas as categorias" desfaz. |
 | **Local ▾** | Igual à categoria, para o local. |
@@ -56,5 +56,6 @@ flutter test test/filtro_test.dart test/filtros_feed_test.dart
 
 | Teste | Confere |
 | --- | --- |
-| `filtro_test.dart` | O critério de pronto da tarefa (achado + Eletrônicos + Biblioteca + "fone" mostra só os itens certos, inclusive um que tem "FÔNE" só na descrição), cada filtro sozinho, a busca sem acento e sem maiúscula, o limpar e a ordem das opções |
+| `filtro_test.dart` | O critério de pronto da tarefa (achado + Eletrônicos + Biblioteca + "fone" mostra só os itens certos, inclusive um que tem "FÔNE" só na descrição), cada filtro sozinho, a busca sem acento e sem maiúscula, a busca com várias palavras (em qualquer ordem, uma no título e outra na descrição, espaços repetidos), o limpar e a ordem das opções |
 | `filtros_feed_test.dart` | A tela de verdade: tocar em Perdidos, escolher um local na lista, digitar uma busca sem acento, e o aviso de "nenhum item" com o Limpar |
+| `firestore-tests/web-ct.test.js` | No Chrome, contra os emuladores: CT-19 a CT-23, incluindo o CT-21 (`garrafa prata` acha "Garrafa térmica prata"), que era o defeito da issue #4 |
