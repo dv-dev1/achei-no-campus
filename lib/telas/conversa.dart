@@ -114,6 +114,18 @@ class _TelaConversaState extends State<TelaConversa> {
     return StreamBuilder<List<Mensagem>>(
       stream: _mensagens,
       builder: (context, snapshot) {
+        // Sem este ramo, um erro do stream (como a regra negando a leitura)
+        // virava um carregando para sempre. Tentar de novo assina outra vez.
+        if (snapshot.hasError) {
+          return Aviso(
+            icone: Icons.cloud_off,
+            texto: 'Não foi possível carregar as mensagens.',
+            acao: TextButton(
+              onPressed: () => setState(() => _mensagens = null),
+              child: const Text('Tentar de novo'),
+            ),
+          );
+        }
         if (!snapshot.hasData) {
           return const Center(child: CircularProgressIndicator());
         }
