@@ -278,15 +278,20 @@ class _FotoGrande extends StatelessWidget {
       ),
     );
 
-    return AspectRatio(
-      aspectRatio: 4 / 3,
-      child: item.temFoto
-          ? Image.network(
-              item.fotoUrl,
-              fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => semFoto,
-            )
-          : semFoto,
+    // Na web em tela larga, 4:3 da largura toda passa da altura da janela e
+    // empurra título e dados para fora da vista.
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxHeight: 400),
+      child: AspectRatio(
+        aspectRatio: 4 / 3,
+        child: item.temFoto
+            ? Image.network(
+                item.fotoUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, _, _) => semFoto,
+              )
+            : semFoto,
+      ),
     );
   }
 }

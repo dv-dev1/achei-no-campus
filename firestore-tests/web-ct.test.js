@@ -331,7 +331,7 @@ test('CT-26 — item sem foto abre o detalhe', { timeout: 180000 }, () => comApp
   await publicar(app, { titulo: 'Caderno sem capa', tipo: 'Perdido', categoria: 'Material escolar', local: 'Auditório' });
   await app.tocarContendo('Caderno sem capa');
   await app.esperarRotulo('Item perdido');
-  assert.ok(await app.tem('Caderno sem capa'));
+  assert.ok(await app.tem('Caderno sem capa'), (await app.rotulos()).join(' | '));
 }));
 
 test('CT-38 — outro usuário não edita nem apaga o item', { timeout: 240000 }, () => comDoisApps(async (dono, visitante) => {
