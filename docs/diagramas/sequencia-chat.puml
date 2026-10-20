@@ -1,0 +1,41 @@
+@startuml sequencia-chat
+' Primeira mensagem de uma conversa e o contador de não lidas.
+' O passo "espera o envio voltar" é a correção da issue #3 (docs/chat.md).
+' Gerar o SVG: ver docs/diagramas/README.md.
+skinparam defaultFontName sans-serif
+skinparam sequence {
+  ParticipantBackgroundColor #F7F7F7
+  ParticipantBorderColor #003B71
+  LifeLineBorderColor #003B71
+}
+
+actor "Interessado" as B
+participant "App do\ninteressado" as AppB
+database "Firestore\n(com as regras)" as FS
+participant "App do\ndono" as AppA
+actor "Dono do item" as A
+
+B -> AppB : toca em Conversar no detalhe
+AppB -> FS : escuta as conversas dele\n(where participantes contém uid)
+note right of AppB : a conversa ainda não existe:\n"Mande a primeira mensagem"
+
+B -> AppB : escreve e toca em Enviar
+AppB -> FS : set conversas/{item}_{interessado}\nnaoLidas = { interessado: 0, dono: 1 }
+FS --> AppB : servidor confirma a conversa
+AppB -> FS : add mensagens/{id}
+FS --> AppB : servidor confirma a mensagem
+note right of AppB : só agora a tela escuta as mensagens;\nantes, a regra negaria a leitura (#3)
+AppB -> FS : escuta conversas/{id}/mensagens
+FS --> AppB : a mensagem aparece no balão azul
+
+FS --> AppA : a conversa chega pela lista do dono
+AppA -> A : aba Mensagens mostra 1
+
+A -> AppA : abre a conversa
+AppA -> FS : update naoLidas.dono = 0
+FS --> AppA : o número some da aba
+
+A -> AppA : responde
+AppA -> FS : lote: update da conversa\n(naoLidas.interessado + 1) e a mensagem nova
+FS --> AppB : a resposta chega em tempo real
+@enduml

@@ -1,0 +1,40 @@
+@startuml arquitetura
+' Partes do sistema e como conversam, como o app está na main.
+' Gerar o SVG: ver docs/diagramas/README.md.
+!pragma layout smetana
+skinparam defaultFontName sans-serif
+skinparam component {
+  BackgroundColor #F7F7F7
+  BorderColor #003B71
+}
+skinparam node {
+  BackgroundColor #FFFFFF
+  BorderColor #003B71
+}
+
+node "Aparelho do aluno" {
+  component "App Flutter\n(web, Android, iOS)" as App
+}
+
+cloud "Firebase (plano Spark)" {
+  component "Authentication\n(e-mail e senha, verificação)" as Auth
+  component "Cloud Firestore" as Firestore
+  component "Regras\n(firestore.rules)" as Regras
+  component "Hosting\n(previsto, #7)" as Hosting
+}
+
+cloud "Cloudinary (plano grátis)" {
+  component "Upload unsigned\n(fotos dos itens)" as Cloudinary
+}
+
+App --> Auth : cadastro, login,\ntoken com e-mail verificado
+App --> Firestore : itens, perfis, conversas\ne mensagens em tempo real
+Firestore ..> Regras : toda leitura e escrita\npassa pelas regras
+App --> Cloudinary : envia a foto (bytes),\nrecebe a URL https
+Hosting ..> App : serve a versão web
+
+note bottom of App
+  Hoje o app fala só com os emuladores locais
+  (projeto demo-achei-no-campus). Firebase real: #5.
+end note
+@enduml

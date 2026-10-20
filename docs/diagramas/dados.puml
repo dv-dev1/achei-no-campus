@@ -1,0 +1,58 @@
+@startuml dados
+' Coleções do Firestore, exatamente como as regras (firestore.rules) aceitam.
+' Gerar o SVG: ver docs/diagramas/README.md.
+!pragma layout smetana
+skinparam defaultFontName sans-serif
+skinparam class {
+  BackgroundColor #F7F7F7
+  BorderColor #003B71
+  HeaderBackgroundColor #FED400
+}
+hide circle
+hide methods
+
+class "usuarios/{uid}" as Usuario {
+  {field} nome : string (até 80)
+  {field} curso : string (até 120)
+  criadoEm : timestamp
+}
+
+class "itens/{id}" as Item {
+  tipo : "perdido" | "achado"
+  {field} titulo : string (até 120)
+  {field} descricao : string (até 2000)
+  {field} categoria : string (lista fixa)
+  {field} local : string (lista fixa)
+  {field} fotoUrl : string (https ou vazio)
+  autorId : uid
+  autorNome : string
+  status : "aberto" | "devolvido"
+  criadoEm : timestamp
+}
+
+class "conversas/{itemId}_{interessadoUid}" as Conversa {
+  itemId : id do item
+  participantes : [donoUid, interessadoUid]
+  {field} ultimaMensagem : string (até 5000)
+  atualizadoEm : timestamp
+  naoLidas : { uid: número }
+}
+
+class "conversas/{id}/mensagens/{id}" as Mensagem {
+  autorId : uid
+  {field} texto : string (até 5000)
+  criadoEm : timestamp
+}
+
+Usuario "1" -- "0..*" Item : publica >
+Item "1" -- "0..*" Conversa : é assunto de >
+Usuario "2" -- "0..*" Conversa : participa de >
+Conversa "1" *-- "0..*" Mensagem : contém >
+
+note bottom of Conversa
+  O ID fixo (item + interessado) impede duas
+  conversas da mesma pessoa sobre o mesmo item.
+  Quem envia soma 1 no naoLidas do outro;
+  quem abre a conversa zera o seu.
+end note
+@enduml

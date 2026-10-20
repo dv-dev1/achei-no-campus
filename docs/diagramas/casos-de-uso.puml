@@ -1,0 +1,49 @@
+@startuml casos-de-uso
+' Casos de uso do Achei no Campus, como o app está na main.
+' Gerar o SVG: ver docs/diagramas/README.md.
+!pragma layout smetana
+skinparam defaultFontName sans-serif
+skinparam actorStyle awesome
+skinparam usecase {
+  BackgroundColor #F7F7F7
+  BorderColor #003B71
+}
+left to right direction
+
+actor "Aluno\n(@cs.unipe.edu.br verificado)" as Aluno
+actor "Autor do item" as Autor
+actor "Interessado" as Interessado
+Aluno <|-- Autor
+Aluno <|-- Interessado
+
+rectangle "Achei no Campus" {
+  usecase "Cadastrar e verificar o e-mail\n(RF-01, RF-02)" as UC01
+  usecase "Entrar e sair\n(RF-03)" as UC03
+  usecase "Editar o perfil\n(RF-04)" as UC04
+  usecase "Ver o feed em tempo real\n(RF-07)" as UC07
+  usecase "Filtrar e buscar\n(RF-08, RF-09)" as UC08
+  usecase "Ver o detalhe do item\n(RF-10)" as UC10
+  usecase "Publicar item com foto\n(RF-05, RF-06)" as UC05
+  usecase "Ver Meus itens\n(RF-14)" as UC14
+  usecase "Editar e apagar o item\n(RF-15)" as UC15
+  usecase "Marcar como devolvido\n(RF-13)" as UC13
+  usecase "Conversar sobre o item\n(RF-11)" as UC11
+  usecase "Ver Mensagens e não lidas\n(RF-12)" as UC12
+}
+
+Aluno --> UC01
+Aluno --> UC03
+Aluno --> UC04
+Aluno --> UC07
+Aluno --> UC08
+Aluno --> UC10
+Aluno --> UC05
+Aluno --> UC12
+
+Autor --> UC14
+Autor --> UC15
+Autor --> UC13
+Autor --> UC11
+
+Interessado --> UC11
+@enduml
