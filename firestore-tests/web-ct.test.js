@@ -347,7 +347,7 @@ test('CT-38 — outro usuário não edita nem apaga o item', { timeout: 240000 }
   assert.ok(!rotulos.includes('Apagar item'), 'apareceu Apagar item para quem não é autor');
 }));
 
-test('CT-27 — primeira mensagem cria a conversa', { timeout: 240000 , todo: 'defeito #3: a conversa fica carregando para sempre depois da primeira mensagem' }, () => comDoisApps(async (dono, visitante) => {
+test('CT-27 — primeira mensagem cria a conversa', { timeout: 240000 }, () => comDoisApps(async (dono, visitante) => {
   await limparBanco();
   await entrarVerificado(dono, email('ct27a'));
   await entrarVerificado(visitante, email('ct27b'));

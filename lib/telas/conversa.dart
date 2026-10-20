@@ -45,6 +45,13 @@ class _TelaConversaState extends State<TelaConversa> {
   final _texto = TextEditingController();
   bool _enviando = false;
 
+  // Ligado enquanto a primeira mensagem cria a conversa. Logo depois do
+  // `set`, a conversa já aparece em `_minhas` pela gravação local, antes de
+  // o servidor confirmar; se a tela escutasse as mensagens nesse instante,
+  // a regra negaria a leitura (a conversa ainda não existe lá). Por isso
+  // as mensagens só são escutadas depois que o envio volta.
+  bool _criandoConversa = false;
+
   @override
   void dispose() {
     _texto.dispose();
@@ -99,7 +106,7 @@ class _TelaConversaState extends State<TelaConversa> {
   }
 
   Widget _listaDeMensagens(Conversa? atual) {
-    if (atual == null) {
+    if (atual == null || _criandoConversa) {
       return Aviso(
         icone: Icons.chat_bubble_outline,
         texto:
@@ -108,7 +115,8 @@ class _TelaConversaState extends State<TelaConversa> {
       );
     }
 
-    // As mensagens só podem ser lidas depois que a conversa existe.
+    // As mensagens só podem ser lidas depois que a conversa existe no
+    // servidor (ver `_criandoConversa`).
     _mensagens ??= _conversas.mensagens(atual.id);
 
     return StreamBuilder<List<Mensagem>>(
@@ -150,8 +158,12 @@ class _TelaConversaState extends State<TelaConversa> {
     final texto = _texto.text;
     if (texto.trim().isEmpty || _enviando) return;
 
-    setState(() => _enviando = true);
+    setState(() {
+      _enviando = true;
+      _criandoConversa = !jaExiste;
+    });
     try {
+      // Quando volta, o servidor já confirmou a conversa e a mensagem.
       await _conversas.enviar(widget.conversa, texto, jaExiste: jaExiste);
       _texto.clear();
     } catch (erro) {
@@ -160,7 +172,12 @@ class _TelaConversaState extends State<TelaConversa> {
             .showSnackBar(SnackBar(content: Text(mensagemDeErro(erro))));
       }
     } finally {
-      if (mounted) setState(() => _enviando = false);
+      if (mounted) {
+        setState(() {
+          _enviando = false;
+          _criandoConversa = false;
+        });
+      }
     }
   }
 }
