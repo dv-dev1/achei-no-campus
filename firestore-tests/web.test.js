@@ -7,6 +7,8 @@ import { dirname, extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
+import { caminhoDoNavegador } from './driver.mjs';
+
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../build/web');
 const pause = () => new Promise((resolve) => setTimeout(resolve, 100));
 async function waitFor(check) {
@@ -35,12 +37,7 @@ test('Auth permanece no emulador e restaura o usuário após recarregar o build 
   });
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const profile = await mkdtemp(join(tmpdir(), 'achei-chrome-'));
-  const chromePath = process.env.CHROME_BIN ?? (process.platform === 'darwin'
-    ? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-    : process.platform === 'win32'
-      ? join(process.env.PROGRAMFILES, 'Google/Chrome/Application/chrome.exe')
-      : 'google-chrome');
-  const chrome = spawn(chromePath, [
+  const chrome = spawn(caminhoDoNavegador(), [
     '--headless=new', '--remote-debugging-address=127.0.0.1', '--remote-debugging-port=0',
     `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check',
     ...(process.env.CI ? ['--no-sandbox'] : []), 'about:blank',

@@ -2,6 +2,7 @@
 // do Flutter: é o único DOM que o CanvasKit expõe, e ela só nasce depois do
 // clique no `flt-semantics-placeholder`.
 import { spawn } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { mkdtemp, readFile, rm } from 'node:fs/promises';
 import { createServer } from 'node:http';
 import { tmpdir } from 'node:os';
@@ -50,11 +51,27 @@ function servir() {
   return new Promise((pronto) => servidor.listen(0, '127.0.0.1', () => pronto(servidor)));
 }
 
-function caminhoDoNavegador() {
-  if (process.env.CHROME_BIN) return process.env.CHROME_BIN;
-  if (process.platform === 'darwin') return '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome';
-  if (process.platform === 'win32') return join(process.env.PROGRAMFILES, 'Google/Chrome/Application/chrome.exe');
-  return 'google-chrome';
+// O Edge vem instalado no Windows e fala o mesmo CDP: serve quando falta o Chrome.
+function candidatos(plataforma, env) {
+  if (plataforma === 'darwin') {
+    return ['Google Chrome', 'Microsoft Edge', 'Chromium'].map((nome) => `/Applications/${nome}.app/Contents/MacOS/${nome}`);
+  }
+  if (plataforma === 'win32') {
+    return [env.PROGRAMFILES, env['PROGRAMFILES(X86)'], env.LOCALAPPDATA].filter(Boolean).flatMap((base) => [
+      join(base, 'Google/Chrome/Application/chrome.exe'),
+      join(base, 'Microsoft/Edge/Application/msedge.exe'),
+    ]);
+  }
+  return null;
+}
+
+export function caminhoDoNavegador(plataforma = process.platform, env = process.env, existe = existsSync) {
+  if (env.CHROME_BIN) return env.CHROME_BIN;
+  const lista = candidatos(plataforma, env);
+  if (!lista) return 'google-chrome';
+  const achado = lista.find((caminho) => existe(caminho));
+  if (achado) return achado;
+  throw new Error(`Nenhum Chrome ou Edge encontrado em: ${lista.join(', ')}. Defina CHROME_BIN com o caminho do navegador.`);
 }
 
 async function conectar(perfil) {

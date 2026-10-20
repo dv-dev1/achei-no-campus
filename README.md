@@ -70,7 +70,7 @@ All tests passed!
 
 O aceite visual no Chrome confirmou cadastro, reenvio, verificação pelo emulador, edição do perfil, publicação sem foto, edição, cancelamento da exclusão, exclusão e saída. Segundo usuário sem ações de dono; tentativas de editar e apagar o item alheio pela API retornaram HTTP 403. Foram inspecionados desktop e viewport 390×844.
 
-`test:web` abre um Chrome headless com perfil temporário, cadastra um usuário fictício, recarrega a página e exige a mesma sessão no emulador. Falha se Auth, Firestore ou renovação de token tentarem acessar Firebase real. Procura Chrome no caminho padrão; para outra instalação, defina `CHROME_BIN`.
+`test:web` abre um Chrome headless com perfil temporário, cadastra um usuário fictício, recarrega a página e exige a mesma sessão no emulador. Falha se Auth, Firestore ou renovação de token tentarem acessar Firebase real. Procura Chrome e Edge nos caminhos padrão do macOS e do Windows; para outra instalação, defina `CHROME_BIN`. `test:ct` usa o mesmo navegador.
 
 O workflow em `.github/workflows/ci.yml` executa análise, testes Flutter, build web, regras e recarga no Chrome no projeto demo sem credenciais reais. A execução remota fica pendente de publicar a branch.
 
