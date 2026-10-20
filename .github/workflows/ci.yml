@@ -36,6 +36,8 @@ jobs:
         working-directory: firestore-tests
       - run: npx --no-install firebase emulators:exec --config ../firebase.json --project demo-achei-no-campus --only auth,firestore "npm run test:ct"
         working-directory: firestore-tests
+        # Um caso que não termina segura o job até o limite de 6 h do Actions.
+        timeout-minutes: 20
 
   firestore:
     runs-on: ubuntu-24.04
