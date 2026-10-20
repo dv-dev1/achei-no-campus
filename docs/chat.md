@@ -49,7 +49,7 @@ As regras protegem as conversas (só os participantes leem e escrevem), e isso p
 
 1. **Ninguém consegue ler uma conversa que ainda não existe.** A regra confere os participantes do documento, e um documento que não existe não tem participantes. Por isso a tela da conversa não lê o documento direto: ela escuta **a lista de conversas do usuário** (`where('participantes', arrayContains: uid)`), que é permitida, e procura a conversa nela. Se não está lá, é conversa nova.
 2. **A primeira mensagem vai em dois passos:** primeiro cria a conversa, depois a mensagem. A regra da mensagem confere a conversa *que já existe*, então as duas juntas num lote só são negadas. A partir da segunda mensagem, o update da conversa e a mensagem nova vão juntos num lote (`batch`).
-3. **As mensagens só são escutadas depois que a conversa existe**, pelo mesmo motivo do item 1.
+3. **As mensagens só são escutadas depois que a conversa existe no servidor**, pelo mesmo motivo do item 1. Cuidado com o "existe": logo depois de criar a conversa, ela já aparece na lista do usuário pela gravação local, antes de o servidor confirmar. Se a tela escutasse as mensagens nesse instante, a regra negaria (`permission-denied`), porque no servidor a conversa ainda não está lá. Era o defeito da issue #3: a tela ficava no carregando para sempre. Por isso, na primeira mensagem, a tela da conversa espera o `enviar` voltar (quando volta, o servidor já confirmou a conversa e a mensagem) e só então escuta as mensagens. Se o stream das mensagens der erro mesmo assim, a tela mostra "Não foi possível carregar as mensagens." com **Tentar de novo**, em vez de carregar para sempre.
 
 Esses três pontos estão testados contra as regras de verdade em `firestore-tests/chat.test.js`.
 
@@ -91,4 +91,7 @@ npx --no-install firebase emulators:exec --config ../firebase.json --project dem
 | --- | --- |
 | `conversas_test.dart` | O ID fixo, o formato que as regras exigem, o contador subindo e zerando, cada um vendo só as suas conversas, mensagem vazia ou longa demais recusada, título do item e nome |
 | `chat_telas_test.dart` | **O critério de pronto da tarefa de ponta a ponta:** Bruno conversa pelo detalhe, o número aparece na aba da Ana, ela abre e o número some, ela responde e o contador do Bruno sobe. Também: Conversar duas vezes não duplica, mensagem em branco não sai, aba vazia, troca de abas |
-| `firestore-tests/chat.test.js` | A mesma sequência do app contra as **regras reais**, incluindo a outra parte do critério de pronto: **um terceiro não lista, não lê e não envia** |
+| `firestore-tests/chat.test.js` | A mesma sequência do app contra as **regras reais**, incluindo a outra parte do critério de pronto: **um terceiro não lista, não lê e não envia**. Também prova o motivo do item 3: as mensagens de uma conversa que ainda não existe não podem ser lidas |
+| `firestore-tests/web-ct.test.js` | CT-27 a CT-30: o app de verdade no Chrome, com duas contas, contra os emuladores. É ele que pega o defeito do item 3, porque o Firestore de mentira dos testes Flutter não aplica as regras nem tem a demora do servidor. O CT-27 já vale; o CT-28 e o CT-29/30 seguem como `todo` até o roteiro deles ser ajustado (ver a issue #3) |
+
+O `web-ct.test.js` roda com `npm run test:ct`, depois de `flutter build web` (o passo a passo está em `docs/testes.md`).
