@@ -498,5 +498,6 @@ operável pela automação); o resto do caminho é o do app: redimensionar, envi
 | Lúcio | Revisar requisitos e diagramas (#9), agora liberada pela #8 |
 | Lúcio | CT-14 a CT-16 no Android (#11) e reteste da coluna W |
 | Daniel | Usar `tbeq7obd` e `achei_unsigned` nos builds da #5, #7 e #11 |
+| Daniel | Defeito achado ao rodar `flutter run -d chrome` (modo debug): o botão **Já verifiquei** não faz nada. `_verificar` em `lib/main.dart:95` usa `setState(() => _acesso = ...)`, e a seta devolve o `Future`; no debug o Flutter lança "setState() callback argument returned a Future" antes de redesenhar. No build release a checagem não existe, por isso CI e `test:ct` não pegam. Correção: `setState(() { _acesso = widget.sessao.prepararAcesso(); });`. Contorno até lá: `flutter run -d chrome --release` |
 | Daniel | O CI do `d7f7a17` (a #14) ficou mais de 2h30 "em andamento"; o do `6f39942`, logo depois, terminou em 9 min. Vale cancelar o travado |
 | Daniel | Com a #3 e a #4, o `test:ct` do CI passa de `todo 4` para `todo 2` |
