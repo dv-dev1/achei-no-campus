@@ -71,6 +71,16 @@ test('a conversa nova não pode ser lida antes de existir (por isso o app usa a 
   )));
 });
 
+test('as mensagens só podem ser escutadas depois que a conversa existe no servidor (por isso a tela espera o envio)', async () => {
+  const mensagens = () => query(
+    collection(db('bruno'), 'conversas/fone_bruno/mensagens'), orderBy('criadoEm'),
+  );
+  // A regra das mensagens confere a conversa gravada; antes dela, nega.
+  await assertFails(getDocs(mensagens()));
+  await primeiraMensagemDoBruno();
+  await assertSucceeds(getDocs(mensagens()));
+});
+
 test('primeira mensagem: criar a conversa e depois a mensagem', async () => {
   await assertSucceeds(primeiraMensagemDoBruno());
 });
