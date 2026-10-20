@@ -3,6 +3,8 @@
 Achados e perdidos da UNIPÊ: cadastro acadêmico verificado, perfil, publicação, edição e exclusão dos próprios itens, feed com filtros e busca, detalhe, marcar como devolvido, "Meus itens" e chat por item com contador de não lidas.
 App Flutter com Firebase local. Projeto acadêmico, não oficial da UNIPÊ. Cada parte tem um guia em [`docs/`](docs/).
 
+Requisitos (RF, RNF e histórias de usuário, cada um com o caso de teste que o prova) em [`docs/requisitos.md`](docs/requisitos.md); diagramas de casos de uso, dados, arquitetura e do chat, em PlantUML com o SVG ao lado, em [`docs/diagramas/`](docs/diagramas/). Para gerar os SVG de novo: `java -jar plantuml-1.2026.9.jar -charset UTF-8 -tsvg docs/diagramas/*.puml` (detalhes em [`docs/diagramas/README.md`](docs/diagramas/README.md)).
+
 **Status (07/10):** as entregas de código de Daniel e Cauê estão todas na `main` e conferidas juntas; o projeto entra na **fase de testes** com Lúcio. Web executável; Android/iOS têm scaffold e ainda precisam do aceite de Lúcio. Foto é opcional; upload real depende de configurar o Cloudinary. Escopo desta entrega em [`specs/2026-10-06-daniel-vieira.md`](specs/2026-10-06-daniel-vieira.md), decisões gerais em [`specs/2026-10-02-achei-no-campus.md`](specs/2026-10-02-achei-no-campus.md).
 
 ## Executar localmente
