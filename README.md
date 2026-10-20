@@ -39,7 +39,7 @@ Auth usa `127.0.0.1:9099`, Firestore `127.0.0.1:8080` e a interface dos emulador
 
 Cadastre um e-mail de teste com `@cs.unipe.edu.br`. O link de verificação aparece no terminal do emulador, sem enviar e-mail real. Abra o link e volte ao app para tocar em **Já verifiquei**. **Reenviar verificação** gera outro link. O perfil só é criado após confirmação, recarga do usuário e renovação do token.
 
-O emulador Android usa `10.0.2.2`; web e simulador iOS usam `127.0.0.1`. Para outro host, use `--dart-define=EMULATOR_HOST=<host>` e ajuste a escuta dos emuladores. Android precisa de Android SDK; iOS precisa de Xcode. Os builds móveis ainda não foram verificados nesta entrega.
+O emulador Android usa `10.0.2.2`; web e simulador iOS usam `127.0.0.1`. Para outro host, use `--dart-define=EMULATOR_HOST=<host>` e ajuste a escuta dos emuladores. Android precisa de Android SDK; iOS precisa de Xcode. O APK de debug compila (`flutter build apk --debug`); o build iOS ainda não foi verificado.
 
 ## Fotos
 
