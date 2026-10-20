@@ -342,11 +342,11 @@ O V5 exige o V3 antes, porque o `driver.mjs` serve o `build/web`. O Chrome está
 - [x] 2.1 Busca por várias palavras; CT-21 sem `todo`
 - [x] 2.2 `docs/filtros.md` atualizado
 - [x] ⏸ Etapa 2: push e registro (#4)
-- [ ] 3.1 PlantUML instalado e determinístico
-- [ ] 3.2 `docs/requisitos.md`
-- [ ] 3.3 Quatro diagramas `.puml` + `.svg`
-- [ ] 3.4 README com os links
-- [ ] ⏸ Etapa 3: push e registro (#8)
+- [x] 3.1 PlantUML instalado e determinístico
+- [x] 3.2 `docs/requisitos.md`
+- [x] 3.3 Quatro diagramas `.puml` + `.svg`
+- [x] 3.4 README com os links
+- [x] ⏸ Etapa 3: push e registro (#8)
 - [ ] 4.1 Conta e preset do Cloudinary
 - [ ] 4.2 Preset conferido na API
 - [ ] 4.3 CT-14 e CT-16 na web
@@ -431,10 +431,28 @@ no título ou na descrição, em qualquer ordem. `garrafa prata` acha "Garrafa t
 
 **Para o Lúcio:** reteste e fechamento da #4.
 
+### Etapa 3 — #8, requisitos e diagramas
+
+Commits: `1f7fac5` (`docs/requisitos.md`), `b3c74ac` (os quatro diagramas e
+`docs/diagramas/README.md`) e `e7a615d` (link no README).
+
+- `docs/requisitos.md`: 15 RF, 9 RNF, histórias por papel e o que ficou de fora. Os 45 `CT-xx`
+  citados existem em `docs/testes.md`, e todo RF cita pelo menos um.
+- `docs/diagramas/`: `casos-de-uso`, `dados`, `arquitetura` e `sequencia-chat`, cada um com o
+  `.puml` e o `.svg`. PlantUML **1.2026.9** com `!pragma layout smetana` (sem Graphviz) e
+  `-charset UTF-8`. Gerar de novo e rodar `git status --short docs/diagramas` não lista nada,
+  inclusive com os `.puml` em CRLF (como o Windows faz no checkout).
+- O critério da issue usa `plantuml -tsvg`; no Windows o comando é
+  `java -jar plantuml-1.2026.9.jar -charset UTF-8 -tsvg docs/diagramas/*.puml`.
+
+**Para o Lúcio:** a #9 (revisar requisitos e diagramas contra o app) está liberada. A pendência
+"os documentos ainda não existem", em `docs/testes.md`, já pode sair.
+
 ### Pendências de outras pessoas
 
 | Quem | O quê |
 |---|---|
 | Lúcio | Ajustar o roteiro do CT-28 e do CT-29/30 (acima); retestar e fechar a #3 e a #4 |
+| Lúcio | Revisar requisitos e diagramas (#9), agora liberada pela #8 |
 | Daniel | O CI do `d7f7a17` (a #14) ficou mais de 2h30 "em andamento"; o do `6f39942`, logo depois, terminou em 9 min. Vale cancelar o travado |
 | Daniel | Com a #3 e a #4, o `test:ct` do CI passa de `todo 4` para `todo 2` |
