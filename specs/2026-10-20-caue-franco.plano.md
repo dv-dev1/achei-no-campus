@@ -347,11 +347,11 @@ O V5 exige o V3 antes, porque o `driver.mjs` serve o `build/web`. O Chrome está
 - [x] 3.3 Quatro diagramas `.puml` + `.svg`
 - [x] 3.4 README com os links
 - [x] ⏸ Etapa 3: push e registro (#8)
-- [ ] 4.1 Conta e preset do Cloudinary
-- [ ] 4.2 Preset conferido na API
-- [ ] 4.3 CT-14 e CT-16 na web
-- [ ] 4.4 README "Fotos"
-- [ ] ⏸ Etapa 4: push e registro (#6)
+- [x] 4.1 Conta e preset do Cloudinary
+- [x] 4.2 Preset conferido na API
+- [x] 4.3 CT-14 e CT-16 na web
+- [x] 4.4 README "Fotos"
+- [x] ⏸ Etapa 4: push e registro (#6)
 
 ## Registro da execução
 
@@ -448,11 +448,55 @@ Commits: `1f7fac5` (`docs/requisitos.md`), `b3c74ac` (os quatro diagramas e
 **Para o Lúcio:** a #9 (revisar requisitos e diagramas contra o app) está liberada. A pendência
 "os documentos ainda não existem", em `docs/testes.md`, já pode sair.
 
+### Etapa 4 — #6, Cloudinary de verdade
+
+Commit: `70c52f3` (README, seção "Fotos").
+
+**Conta e preset:** conta grátis do Cauê, cloud name `tbeq7obd`. Preset `achei_unsigned`
+criado no console: unsigned, pasta `achei` com a pasta como prefixo do public ID, formatos
+`jpg,png,webp`, transformação de entrada `c_limit,w_1280,h_1280`, public ID aleatório e
+"Disallow public ID" ligado.
+
+**Preset direto na API** (`curl` da issue):
+
+| Envio | Resultado |
+|---|---|
+| PNG de 350 KB | `200`, `secure_url` em `res.cloudinary.com/tbeq7obd/image/upload/.../achei/...` |
+| PDF | `400`, "Image file format pdf not allowed" |
+| PNG de 3 MB | `200`: **aceito**. O Cloudinary não tem limite de tamanho por preset |
+| PNG com `public_id=sobrescrever` | ignorado; o Cloudinary gerou um nome aleatório |
+
+O item do "pronto quando" que pede o envio acima de 2 MB **recusado pelo Cloudinary** não tem
+como passar: não existe essa opção no preset. Os 2 MB são garantidos pelo app
+(`limiteFotoBytes`), e isso está registrado no README.
+
+**No app, na web** (Chrome 155, build com os dois `--dart-define`, contra os emuladores):
+
+- CT-14 ✅: item publicado com foto da galeria; a `fotoUrl` gravada é
+  `https://res.cloudinary.com/tbeq7obd/image/upload/v1792519163/achei/lstiubyyakdrrodbmlnp.png`,
+  e a foto aparece no card do feed e no detalhe (as duas requisições à foto voltaram `200`).
+- CT-16 ✅: foto de 3 MB recusada na tela com "A foto deve ter no máximo 2 MB.".
+- CT-15 ⏳: na web do computador, o botão Câmera só abre o seletor de arquivo; o teste real é
+  no celular (#11).
+
+A escolha do arquivo foi automatizada no navegador (o seletor nativo do Windows não é
+operável pela automação); o resto do caminho é o do app: redimensionar, enviar e gravar.
+
+**Para o Daniel:** cloud name `tbeq7obd` e preset `achei_unsigned` para a #5, a #7 e a #11
+(os comandos estão no README).
+
+**Para o Lúcio:** CT-14 a CT-16 na coluna A (Android), pela #11, e o reteste da coluna W.
+
+**Para o Cauê:** apagar no Media Library do Cloudinary as imagens enviadas nos testes de
+20/10 (três na raiz e três em `achei/`).
+
 ### Pendências de outras pessoas
 
 | Quem | O quê |
 |---|---|
 | Lúcio | Ajustar o roteiro do CT-28 e do CT-29/30 (acima); retestar e fechar a #3 e a #4 |
 | Lúcio | Revisar requisitos e diagramas (#9), agora liberada pela #8 |
+| Lúcio | CT-14 a CT-16 no Android (#11) e reteste da coluna W |
+| Daniel | Usar `tbeq7obd` e `achei_unsigned` nos builds da #5, #7 e #11 |
 | Daniel | O CI do `d7f7a17` (a #14) ficou mais de 2h30 "em andamento"; o do `6f39942`, logo depois, terminou em 9 min. Vale cancelar o travado |
 | Daniel | Com a #3 e a #4, o `test:ct` do CI passa de `todo 4` para `todo 2` |
