@@ -411,7 +411,11 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 1. Conferir no campus cada nome de `lib/config.dart`.
 
 **Esperado:** todos existem, com o nome que as pessoas usam.
-**Obtido:** ⏳ — depende de ir ao campus.
+**Obtido:** ⏳ — depende de ir ao campus. Corrigir a lista depende também da
+[#15](https://github.com/dv-dev1/achei-no-campus/issues/15): hoje renomear um
+local trava a edição dos itens já publicados com o nome antigo. Os nomes
+`Biblioteca`, `Reitoria` e `Ginásio` estão fixos em testes de `test/`, que
+precisam ser atualizados no mesmo commit da mudança.
 
 ### CT-45 — Rodar tudo na versão final
 
@@ -465,6 +469,7 @@ falta, nesta ordem: um AVD Android instalado, e o Chrome para a coluna **W**.
 | [#3](https://github.com/dv-dev1/achei-no-campus/issues/3) | A conversa fica carregando para sempre depois da primeira mensagem | alta | Cauê | aberta |
 | [#4](https://github.com/dv-dev1/achei-no-campus/issues/4) | Busca com duas palavras não encontra o item | média | Cauê | aberta |
 | [#2](https://github.com/dv-dev1/achei-no-campus/issues/2) | `npm run test:web` falha com `ENOENT` em máquina Windows sem Chrome no caminho padrão | baixa | Daniel | aberta |
+| [#15](https://github.com/dv-dev1/achei-no-campus/issues/15) | Editar item cujo local saiu da lista de `locais` não abre a tela | média | Daniel | aberta |
 
 A #4 é o defeito que o CT-21 já descrevia sem issue aberta; agora tem número e
 é rastreável. Nenhuma issue é fechada antes do reteste pelo QA.
@@ -513,6 +518,7 @@ e reteste. Cada item abaixo tem o caso de teste que o prova e o comando que o ro
 | Issue | Sintoma | Casos | Reteste |
 |---|---|---|---|
 | [#2](https://github.com/dv-dev1/achei-no-campus/issues/2) | `npm run test:web` falha com `ENOENT` em máquina Windows sem Chrome no caminho padrão. | CT-39 | `npm run test:web` |
+| [#15](https://github.com/dv-dev1/achei-no-campus/issues/15) | Editar item cujo local saiu da lista de `locais` não abre a tela: o `initialValue` do seletor vem do item salvo e os `items` vêm de `locais`. | CT-44 | `flutter test` |
 
 ### Como rodar o reteste
 
