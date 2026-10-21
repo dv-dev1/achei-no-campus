@@ -497,6 +497,33 @@ que reproduzem as issues #3 e #4 — ficam fora do vermelho do CI de propósito,
 para que uma falha nova continue significando regressão nova. Quando a correção
 chegar, tirar o `todo` e rodar de novo: é esse o reteste.
 
+### Rodada de 21/10/2026 — reteste das correções do Cauê
+
+As correções de #3 e #4 chegaram na `main` (`99b7646` e `bb8528f`). Reteste
+tirando o `todo` dos casos e rodando o comando acima:
+
+| Caso | Resultado | Issue |
+|---|---|---|
+| CT-21 — busca com mais de uma palavra | ✅ | #4 pode fechar |
+| CT-27 — primeira mensagem cria a conversa | ✅ | — |
+| CT-28 — conversa chega em tempo real na outra aba | ❌ | #3 continua aberta |
+| CT-29 e CT-30 — contador de não lidas sobe e zera ao abrir | ❌ | #3 continua aberta |
+
+O `99b7646` resolveu o nascimento da conversa, que é o CT-27, mas a mensagem
+não chega na outra aba:
+
+```
+CT-28:        Tempo esgotado esperando o rótulo "Mensagens" aparecer na tela.
+CT-29 e CT-30: Tempo esgotado esperando o rótulo "1" aparecer na tela.
+```
+
+Os dois `todo` do #3 foram repostos em `firestore-tests/web-ct.test.js`: o
+defeito segue registrado, e o CI vermelho tem que continuar significando
+regressão nova. O `todo` do CT-21 já tinha sido tirado pelo Cauê e fica fora.
+
+**Pendente desta rodada:** reteste do #2 (`npm run test:web`, a correção é o
+`a999394`), fechar o #4, e devolver o #3 ao Cauê com a evidência acima.
+
 O que o navegador **não** cobre, e por isso segue manual: foto pela galeria e
 pela câmera (CT-14, CT-15, CT-16), o terceiro que não lê a conversa (CT-31, já
 coberto por `firestore-tests/chat.test.js`), e tudo que depende de toque em
