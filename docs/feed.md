@@ -30,7 +30,7 @@ A base do Daniel (06/10) já ligou tudo o que o feed precisava:
 
 - **Pacotes:** `cloud_firestore` e companhia estão no `pubspec.yaml`.
 - **Rota de publicar:** o botão **Publicar** abre a rota `/publicar`, registrada no `onGenerateRoute` do `main.dart`.
-- **Onde o feed aparece:** é a primeira aba da tela de início (`lib/telas/inicio.dart`), que o portão do login abre depois que o e-mail é verificado. Ver [`chat.md`](chat.md#a-barra-de-abas).
+- **Onde o feed aparece:** é a primeira aba da tela de início (`lib/telas/inicio.dart`), que o portão do login abre assim que o aluno entra. Ver [`chat.md`](chat.md#a-barra-de-abas).
 - **Índice composto:** filtrar por `status` e ordenar por `criadoEm` exige um índice, que já está versionado em `firestore.indexes.json`. Os emuladores não precisam dele, mas o Firebase de verdade sim. Quando o app for para lá, suba com `firebase deploy --only firestore:indexes`. Sem o índice, o feed cai no estado de erro e o console mostra `FAILED_PRECONDITION: The query requires an index`.
 
 **Sobre o modelo do item:** `lib/modelos/item.dart` foi criado junto com o feed, seguindo os campos da spec, e a base do Daniel usa o mesmo modelo.

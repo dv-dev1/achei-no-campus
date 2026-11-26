@@ -1,6 +1,6 @@
 # Achei no Campus
 
-Achados e perdidos da UNIPÊ: cadastro acadêmico verificado, perfil, publicação, edição e exclusão dos próprios itens, feed com filtros e busca, detalhe, marcar como devolvido, "Meus itens" e chat por item com contador de não lidas.
+Achados e perdidos da UNIPÊ: cadastro com e-mail acadêmico (`@cs.unipe.edu.br`, sem verificação por e-mail), perfil, publicação, edição e exclusão dos próprios itens, feed com filtros e busca, detalhe, marcar como devolvido, "Meus itens" e chat por item com contador de não lidas.
 App Flutter com Firebase local. Projeto acadêmico, não oficial da UNIPÊ. Cada parte tem um guia em [`docs/`](docs/).
 
 Requisitos (RF, RNF e histórias de usuário, cada um com o caso de teste que o prova) em [`docs/requisitos.md`](docs/requisitos.md); diagramas de casos de uso, dados, arquitetura e do chat, em PlantUML com o SVG ao lado, em [`docs/diagramas/`](docs/diagramas/). Para gerar os SVG de novo: `java -jar plantuml-1.2026.9.jar -charset UTF-8 -tsvg docs/diagramas/*.puml` (detalhes em [`docs/diagramas/README.md`](docs/diagramas/README.md)).
@@ -37,7 +37,7 @@ flutter run -d chrome
 
 Auth usa `127.0.0.1:9099`, Firestore `127.0.0.1:8080` e a interface dos emuladores fica em `http://127.0.0.1:4000`. Dados são temporários e ficam no emulador. O app conecta sempre ao projeto `demo-achei-no-campus`, nunca a serviços reais.
 
-Cadastre um e-mail de teste com `@cs.unipe.edu.br`. O link de verificação aparece no terminal do emulador, sem enviar e-mail real. Abra o link e volte ao app para tocar em **Já verifiquei**. **Reenviar verificação** gera outro link. O perfil só é criado após confirmação, recarga do usuário e renovação do token.
+Cadastre um e-mail de teste com `@cs.unipe.edu.br`. O app não pede verificação por e-mail (D1): depois de **Criar conta**, ele abre direto no feed, e o perfil nasce com o nome digitado. Veja o risco em [Limitações conhecidas](#limitações-conhecidas).
 
 O emulador Android usa `10.0.2.2`; web e simulador iOS usam `127.0.0.1`. Para outro host, use `--dart-define=EMULATOR_HOST=<host>` e ajuste a escuta dos emuladores. Android precisa de Android SDK; iOS precisa de Xcode. O APK de debug compila (`flutter build apk --debug`); o build iOS ainda não foi verificado.
 
@@ -88,7 +88,7 @@ All tests passed!
 ℹ fail 0
 ```
 
-O aceite visual no Chrome confirmou cadastro, reenvio, verificação pelo emulador, edição do perfil, publicação sem foto, edição, cancelamento da exclusão, exclusão e saída. Segundo usuário sem ações de dono; tentativas de editar e apagar o item alheio pela API retornaram HTTP 403. Foram inspecionados desktop e viewport 390×844.
+O aceite visual no Chrome (anterior à D1, de 26/11/2026) confirmou cadastro, edição do perfil, publicação sem foto, edição, cancelamento da exclusão, exclusão e saída. Segundo usuário sem ações de dono; tentativas de editar e apagar o item alheio pela API retornaram HTTP 403. Foram inspecionados desktop e viewport 390×844.
 
 `test:web` abre um Chrome headless com perfil temporário, cadastra um usuário fictício, recarrega a página e exige a mesma sessão no emulador. Falha se Auth, Firestore ou renovação de token tentarem acessar Firebase real. Procura Chrome e Edge nos caminhos padrão do macOS e do Windows; para outra instalação, defina `CHROME_BIN`. `test:ct` usa o mesmo navegador. Se aparecer `Não foi possível abrir o navegador em "..."`, o caminho citado não abre: aponte `CHROME_BIN` para o `chrome.exe` ou o `msedge.exe` (no Windows, por exemplo `$env:CHROME_BIN = 'C:\Program Files\Google\Chrome\Application\chrome.exe'`; no Linux, `export CHROME_BIN=/usr/bin/google-chrome`) e rode de novo.
 
@@ -96,7 +96,12 @@ O workflow em `.github/workflows/ci.yml` executa análise, testes Flutter, build
 
 `web/firebase_local.js` conecta Auth antes de o FlutterFire restaurar a sessão. Isso contorna a ordem de inicialização de [FlutterFire #11534](https://github.com/firebase/flutterfire/issues/11534), que impede conectar o emulador após a primeira requisição. O script usa as mesmas opções fornecidas por Dart e Firebase JS SDK 12.19.0, versão usada pelo FlutterFire do `pubspec.lock`. Ao atualizar FlutterFire, mantenha as versões alinhadas e execute `test:web`.
 
-As regras exigem domínio exato e e-mail verificado em todas as coleções; só o dono altera/apaga seus itens e edita seu perfil. Autoria e data de criação são imutáveis. Conversas preservam item e participantes; somente participantes leem/enviam mensagens, com autoria própria. O índice composto do feed está versionado em `firestore.indexes.json`.
+As regras exigem login e o domínio exato do e-mail em todas as coleções, sem exigir e-mail verificado; só o dono altera/apaga seus itens e edita seu perfil. Autoria e data de criação são imutáveis. Conversas preservam item e participantes; somente participantes leem/enviam mensagens, com autoria própria. O índice composto do feed está versionado em `firestore.indexes.json`.
+
+## Limitações conhecidas
+
+- **Conta com endereço inventado do domínio.** O app não verifica o e-mail (decisão D1, em [`specs/2026-11-26-entrega-final.md`](specs/2026-11-26-entrega-final.md)). Qualquer endereço `@cs.unipe.edu.br` entra, mesmo que a caixa não exista. A regra do Firestore confere só o domínio.
+- **Próximo passo: login institucional (SSO).** Se a faculdade contratar, o login passa a vir da conta da UNIPÊ. Google Workspace ou Microsoft funcionam no plano grátis do Firebase; SAML ou OIDC exige o Identity Platform, que é pago. O SSO não está no app; fica só neste registro.
 
 ## Como contribuir
 

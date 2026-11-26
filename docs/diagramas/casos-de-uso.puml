@@ -10,14 +10,14 @@ skinparam usecase {
 }
 left to right direction
 
-actor "Aluno\n(@cs.unipe.edu.br verificado)" as Aluno
+actor "Aluno\n(@cs.unipe.edu.br)" as Aluno
 actor "Autor do item" as Autor
 actor "Interessado" as Interessado
 Aluno <|-- Autor
 Aluno <|-- Interessado
 
 rectangle "Achei no Campus" {
-  usecase "Cadastrar e verificar o e-mail\n(RF-01, RF-02)" as UC01
+  usecase "Cadastrar com e-mail do domínio\n(RF-01, RF-02)" as UC01
   usecase "Entrar e sair\n(RF-03)" as UC03
   usecase "Editar o perfil\n(RF-04)" as UC04
   usecase "Ver o feed em tempo real\n(RF-07)" as UC07

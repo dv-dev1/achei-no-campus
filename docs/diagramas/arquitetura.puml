@@ -17,7 +17,7 @@ node "Aparelho do aluno" {
 }
 
 cloud "Firebase (plano Spark)" {
-  component "Authentication\n(e-mail e senha, verificação)" as Auth
+  component "Authentication\n(e-mail e senha)" as Auth
   component "Cloud Firestore" as Firestore
   component "Regras\n(firestore.rules)" as Regras
   component "Hosting\n(previsto, #7)" as Hosting
@@ -27,7 +27,7 @@ cloud "Cloudinary (plano grátis)" {
   component "Upload unsigned\n(fotos dos itens)" as Cloudinary
 }
 
-App --> Auth : cadastro, login,\ntoken com e-mail verificado
+App --> Auth : cadastro e login,\ntoken com o e-mail do aluno
 App --> Firestore : itens, perfis, conversas\ne mensagens em tempo real
 Firestore ..> Regras : toda leitura e escrita\npassa pelas regras
 App --> Cloudinary : envia a foto (bytes),\nrecebe a URL https

@@ -6,7 +6,7 @@ O que o Achei no Campus faz e com que regras, descrito a partir do app como ele 
 
 | Papel | Quem é |
 | --- | --- |
-| **Aluno** | Qualquer pessoa com e-mail `@cs.unipe.edu.br` verificado. Vê o feed, busca, filtra e publica. |
+| **Aluno** | Qualquer pessoa com e-mail `@cs.unipe.edu.br`. Vê o feed, busca, filtra e publica. |
 | **Autor do item** | O aluno que publicou um item. Só ele edita, apaga e marca o item como devolvido. |
 | **Interessado** | O aluno que toca em **Conversar** no item de outra pessoa, porque acha que o item é dele ou porque o achou. |
 
@@ -25,7 +25,7 @@ Autor e interessado são o mesmo aluno em momentos diferentes: quem publica um i
 | RF | O que o app faz | Onde está | Prova |
 | --- | --- | --- | --- |
 | RF-01 | Cadastro com nome, e-mail e senha. Só aceita e-mail que termina exatamente em `@cs.unipe.edu.br` e senha com pelo menos 6 caracteres. | `lib/telas/entrar.dart`, `lib/sessao.dart`, `lib/config.dart` (`emailPermitido`) | CT-01, CT-02, CT-03, CT-06 |
-| RF-02 | Verificação do e-mail obrigatória antes do feed, com **Reenviar verificação** e o aviso de que o e-mail pode cair no spam. Depois de **Já verifiquei**, o app recarrega o usuário e renova o token, e só então cria o perfil. | `lib/telas/entrar.dart`, `lib/sessao.dart` (`prepararAcesso`) | CT-04, CT-05 |
+| RF-02 | Entrada só com e-mail `@cs.unipe.edu.br`, **sem verificação por e-mail** (decisão D1, em [`specs/2026-11-26-entrega-final.md`](../specs/2026-11-26-entrega-final.md)). Depois de **Criar conta**, o app cai direto no feed, e o perfil nasce com o nome digitado. | `lib/telas/entrar.dart`, `lib/sessao.dart` (`cadastrar`, `prepararAcesso`) | CT-01, CT-05 |
 | RF-03 | Entrar com e-mail e senha, com mensagem clara para senha errada, e sair. | `lib/telas/entrar.dart`, `lib/telas/perfil.dart`, `lib/sessao.dart` | CT-05, CT-07, CT-10 |
 | RF-04 | Perfil com nome (obrigatório) e curso (opcional). O nome do perfil é o que aparece nos itens publicados depois. | `lib/telas/perfil.dart`, `lib/sessao.dart` (`salvarPerfil`) | CT-08, CT-09 |
 | RF-05 | Publicar item perdido ou achado: tipo, título, categoria e local obrigatórios, descrição opcional. Na categoria Documentos, avisa para cobrir CPF/RG na foto. | `lib/telas/publicar.dart`, `lib/itens.dart` | CT-11, CT-12, CT-13 |
@@ -44,7 +44,7 @@ Autor e interessado são o mesmo aluno em momentos diferentes: quem publica um i
 
 | RNF | Requisito | Onde está | Prova |
 | --- | --- | --- | --- |
-| RNF-01 | **Só alunos verificados.** Toda leitura e escrita no Firestore exige login, e-mail verificado e o domínio exato `@cs.unipe.edu.br`. A conferência da tela é conveniência; a barreira de verdade é a regra, porque qualquer um cria conta no Firebase Auth pela API. | `firestore.rules` (`aluno()`) | CT-39, CT-40 |
+| RNF-01 | **Só o domínio acadêmico.** Toda leitura e escrita no Firestore exige login e o domínio exato `@cs.unipe.edu.br` no e-mail. A regra não olha se o e-mail foi verificado (D1). A conferência da tela é conveniência; a barreira de verdade é a regra, porque qualquer um cria conta no Firebase Auth pela API. **Limitação conhecida:** sem verificação, dá para criar conta com um endereço inventado do domínio, e o app não tem como saber se a caixa existe. **Próximo passo:** login institucional (SSO), se a faculdade contratar. Google Workspace ou Microsoft funcionam no plano grátis do Firebase; SAML ou OIDC exige o Identity Platform, que é pago. | `firestore.rules` (`aluno()`) | CT-39, CT-40 |
 | RNF-02 | **Cada um mexe só no que é seu.** Item com `autorId` de outra pessoa é recusado; só o autor edita e apaga; autoria e data de criação não mudam. Conversa e mensagens só são lidas e escritas pelos dois participantes, e a mensagem sai sempre com a autoria de quem envia. | `firestore.rules` | CT-31, CT-41, CT-38 |
 | RNF-03 | **Planos grátis.** Firebase no plano Spark (Authentication e Firestore) e Cloudinary grátis para as fotos, porque o Firebase Storage exige o plano pago. Por isso também não há push com o app fechado. | `lib/cloudinary.dart`, `firebase.json` | — (decisão de projeto) |
 | RNF-04 | **Busca no próprio app.** O Firestore não busca texto, então filtros e busca rodam no app, sobre os 200 itens abertos mais recentes que o feed já carregou. | `lib/telas/feed.dart` (`limiteDoFeed`), `lib/util/filtro.dart` | CT-20, CT-21 |

@@ -10,7 +10,7 @@ Todas as funcionalidades entregues por Daniel e por Cauê:
 
 | Área | Telas e arquivos |
 |---|---|
-| Login, cadastro e verificação | `lib/telas/entrar.dart`, `lib/sessao.dart` |
+| Login e cadastro | `lib/telas/entrar.dart`, `lib/sessao.dart` |
 | Perfil e sair | `lib/telas/perfil.dart` |
 | Publicar, editar e apagar item | `lib/telas/publicar.dart`, `lib/itens.dart`, `lib/cloudinary.dart` |
 | Feed, filtros e busca | `lib/telas/feed.dart`, `lib/util/filtro.dart`, `lib/widgets/barra_de_filtros.dart` |
@@ -37,9 +37,8 @@ npx firebase emulators:start --config ../firebase.json \
 ```
 
 O projeto não tem Firebase real: tudo roda contra o emulador local (`lib/firebase_local.dart`).
-Como o e-mail de verificação não é enviado de verdade, a conta é verificada pela
-interface do emulador de Auth (`http://127.0.0.1:4000/auth`), marcando o usuário
-como verificado, e depois tocando em **Já verifiquei** no app.
+Desde 26/11/2026 (D1) o cadastro não pede verificação de e-mail: a conta nova cai direto
+no feed, sem passo nenhum no emulador de Auth.
 
 ### Testes automatizados que já cobrem parte disto
 
@@ -87,8 +86,9 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. Preencher nome `Lúcio Lima`, e-mail `lucio@cs.unipe.edu.br`, senha `senha123`.
 3. Tocar em **Criar conta**.
 
-**Esperado:** a conta é criada e o app mostra a tela "verifique seu e-mail", com o botão **Reenviar**.
-**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
+**Esperado:** a conta é criada e o app abre direto no feed (botão **Publicar** na tela), sem tela de verificação. O perfil `usuarios/{uid}` nasce com o nome digitado (`Lúcio Lima`), e não com o pedaço do e-mail.
+**Mudou em 26/11/2026 (D1):** antes, o esperado era a tela "verifique seu e-mail".
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, reescrito em 26/11/2026) · A ⏳ · I ⏳
 
 ### CT-02 — Cadastro com e-mail fora do domínio
 
@@ -105,21 +105,19 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 **Esperado:** recusado na tela.
 **Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
 
-### CT-04 — Entrar sem verificar o e-mail
+### CT-04 — Entrar sem verificar o e-mail (removido)
 
-1. Cadastrar uma conta e **não** marcá-la como verificada no emulador.
-2. Fechar e abrir o app.
+**Esperado:** não se aplica. Sem verificação (D1), não existe conta "não verificada" para parar numa tela de espera.
+**Obtido:** ➖ removido por D1, 26/11/2026. O caso saiu de `firestore-tests/web-ct.test.js`; o cadastro cair direto no feed é o CT-01.
 
-**Esperado:** o app para na tela "verifique seu e-mail"; o feed não aparece.
-**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
+### CT-05 — Entrar com conta existente
 
-### CT-05 — Entrar depois de verificar
+1. Cadastrar uma conta e sair pelo **Perfil**.
+2. Na tela de entrada, informar o mesmo e-mail e a mesma senha e tocar em **Entrar**.
 
-1. Marcar o usuário como verificado em `http://127.0.0.1:4000/auth`.
-2. Tocar em **Já verifiquei** no app.
-
-**Esperado:** o app chama `reload()` e `getIdToken(true)`, cria `usuarios/{uid}` e abre o feed.
-**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 13/10/2026) · A ⏳ · I ⏳
+**Esperado:** o app abre o feed, com as abas **Feed**, **Mensagens** e **Meus itens**.
+**Mudou em 26/11/2026 (D1):** antes, o caso era entrar depois de confirmar o e-mail.
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, reescrito em 26/11/2026) · A ⏳ · I ⏳
 
 ### CT-06 — Senha curta
 
@@ -379,10 +377,11 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 **Esperado:** um usuário autenticado com outro domínio recebe `PERMISSION_DENIED` em qualquer leitura.
 **Obtido:** ✅ (automatizado, `firestore-tests/rules.test.js`).
 
-### CT-40 — E-mail não verificado não escreve
+### CT-40 — Domínio certo basta, sem verificação
 
-**Esperado:** `PERMISSION_DENIED` ao tentar criar item.
-**Obtido:** ✅ (automatizado).
+**Esperado:** um usuário com e-mail do domínio e `email_verified: false` lê e escreve (cria e edita item). A regra confere só o domínio.
+**Mudou em 26/11/2026 (D1):** antes, o caso era "E-mail não verificado não escreve" e esperava `PERMISSION_DENIED`.
+**Obtido:** ✅ (automatizado, `firestore-tests/rules.test.js`, caso `e-mail do domínio sem verificação lê e escreve (D1)`).
 
 ### CT-41 — Item criado com `autorId` de outro
 
