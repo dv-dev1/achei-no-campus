@@ -515,7 +515,7 @@ dá para trocar depois).
 - [x] 4.2b Cadastro grava o nome digitado no perfil
 - [x] 4.3 Casos do navegador sem verificação
 - [x] 4.4 Docs do login novo
-- [ ] ⏸ Etapa 4: push e registro
+- [x] ⏸ Etapa 4: push e registro
 - [ ] 5.1 Lista de locais do Cauê; fecha #10
 - [ ] ⏸ Etapa 5: push e registro
 - [ ] 6.1 Modo produção no código
@@ -643,4 +643,5 @@ hospedagem passou para o GitHub Pages (D10, `91d9ff2`). Os dois são decisões d
 
 **Execução:** um subagente em Sonnet por tarefa, e revisão em Opus no fim de cada uma e no fim da etapa.
 
-**V6:** a preencher depois do push.
+**V6:** run `45893515648` (`5daa248`) `success` em 8 min 25 s: `npm test` 32 de 32, `test:web` 1 de 1,
+`test:ct` 27 de 27, todos com `skipped 0` e `todo 0`. Nenhuma issue fecha nesta etapa.
