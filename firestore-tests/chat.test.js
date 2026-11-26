@@ -13,7 +13,7 @@ import {
 
 let env;
 const db = (uid) => env.authenticatedContext(uid, {
-  email: `${uid}@cs.unipe.edu.br`, email_verified: true,
+  email: `${uid}@cs.unipe.edu.br`,
 }).firestore();
 
 before(async () => {

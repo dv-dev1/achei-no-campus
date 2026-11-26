@@ -14,7 +14,7 @@ const conversa = {
   atualizadoEm: new Date(), naoLidas: { ana: 0, bruno: 0 },
 };
 const db = (uid = 'ana', claims = {}) => env.authenticatedContext(uid, {
-  email: `${uid}@cs.unipe.edu.br`, email_verified: true, ...claims,
+  email: `${uid}@cs.unipe.edu.br`, ...claims,
 }).firestore();
 
 before(async () => {
@@ -39,7 +39,6 @@ beforeEach(async () => {
 
 for (const [nome, usuario] of [
   ['sem login', () => env.unauthenticatedContext().firestore()],
-  ['e-mail não verificado', () => db('ana', { email_verified: false })],
   ['domínio externo', () => db('ana', { email: 'ana@gmail.com' })],
   ['sufixo malicioso', () => db('ana', { email: 'ana@cs.unipe.edu.br.evil.com' })],
   ['domínio sem arroba', () => db('ana', { email: 'cs.unipe.edu.br' })],
@@ -55,7 +54,16 @@ for (const [nome, usuario] of [
   });
 }
 
-test('aluno verificado lê itens e perfis', async () => {
+test('e-mail do domínio sem verificação lê e escreve (D1)', async () => {
+  const store = db('ana', { email_verified: false });
+  for (const path of ['itens/garrafa', 'usuarios/ana', 'conversas/garrafa_bruno', 'conversas/garrafa_bruno/mensagens/ola']) {
+    await assertSucceeds(getDoc(doc(store, path)));
+  }
+  await assertSucceeds(updateDoc(doc(store, 'itens/garrafa'), { titulo: 'Garrafa verde' }));
+  await assertSucceeds(setDoc(doc(store, 'itens/novo'), { ...item, criadoEm: serverTimestamp() }));
+});
+
+test('aluno do domínio lê itens e perfis', async () => {
   await assertSucceeds(getDoc(doc(db('bruno'), 'itens/garrafa')));
   await assertSucceeds(getDocs(collection(db('bruno'), 'itens')));
   await assertSucceeds(getDoc(doc(db('bruno'), 'usuarios/ana')));
