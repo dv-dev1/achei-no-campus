@@ -2,6 +2,10 @@
 
 Função de cada um + o que estava sem dono (**faltava**).
 
+> Desde 26/11/2026 o login não tem verificação por e-mail (decisão D1 em
+> [`specs/2026-11-26-entrega-final.md`](../specs/2026-11-26-entrega-final.md)). As menções à
+> verificação abaixo descrevem o que foi feito em outubro.
+
 ## Daniel (Full Stack)
 
 - [x] Projeto Flutter + Firebase local (Android/iOS/web; build verificado na web)

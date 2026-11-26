@@ -2,6 +2,11 @@
 
 Repositório: https://github.com/dv-dev1/achei-no-campus · Spec: `specs/2026-10-02-achei-no-campus.md`
 
+> **Planejamento de outubro, mantido como histórico.** Desde 26/11/2026 o app não verifica mais o
+> e-mail (decisão D1 em [`specs/2026-11-26-entrega-final.md`](../specs/2026-11-26-entrega-final.md)).
+> O que este documento diz sobre e-mail de verificação e `email_verified` não vale mais. O
+> comportamento atual está em [`requisitos.md`](requisitos.md).
+
 Cada tarefa traz o que fazer e quando ela está pronta. As marcadas com **faltava** não estavam na função original e foram distribuídas.
 
 **Combinados do grupo**
