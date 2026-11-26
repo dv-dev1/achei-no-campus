@@ -308,20 +308,71 @@ o cadastro grava o nome.
 
 ## Etapa 5 — #10: lista de locais
 
-**Depende de:** etapa 3 e da lista que o Cauê vai passar. **Pare e peça a lista antes de começar.**
+**Depende de:** etapa 3. ~~e da lista que o Cauê vai passar. **Pare e peça a lista antes de
+começar.**~~ (26/11/2026: a lista veio, D11.)
 
-### Tarefa 5.1 — Aplicar a lista do Cauê
+> Reescrita em 26/11/2026 com a D11. Duas diferenças do desenho anterior: (1) a lista **também está
+> em `firestore.rules:22`** (`dados.local in [...]`), e o plano antigo só citava o `lib/config.dart`
+> (as regras recusariam todo local novo); (2) o "Outro" ganha texto livre num campo separado.
 
-- **Arquivos:** `lib/config.dart` (`locais`); `docs/testes.md` (CT-44); `docs/visita-campus.md`;
-  testes ou casos que usam nomes de local que mudarem (`grep -rn "'Biblioteca'\|Reitoria\|Ginásio\|Passarela\|Auditório\|Piscina\|Estacionamento\|Centro de Informação" test firestore-tests`).
-- **O que muda:** `locais` = a lista dele, na ordem que ele passar, com `Outro` no fim. CT-44 ✅
-  "lista passada pelo Cauê em DD/MM/2026" (D6). `docs/visita-campus.md` ganha no topo uma nota de
-  que a conferência veio dessa lista, não de uma visita.
-- **Decisão em aberto:** se algum nome usado nos testes sumir, trocar no teste pelo nome novo mais
-  próximo (não recriar o antigo).
-- **Testes:** V1, V2, V4, V5.
-- **Pronto quando:** testes verdes com a lista nova.
-- **Commit:** `feat: lista de locais conferida pelo Cauê`, corpo com `Closes #10`.
+Lista (D11), nesta ordem: `Bloco A`, `Bloco B`, `Bloco C`, `Bloco D`, `Bloco E`, `Bloco F`,
+`Bloco G`, `Bloco H`, `CT (Centro de Tecnologia)`, `Tapiocabana`, `EVA (Espaço de Vida Acadêmica)`,
+`Outro`.
+
+### Tarefa 5.1 — Lista nova nos dois lugares, com um teste que os mantém iguais
+
+- **Arquivos:** `lib/config.dart` (`locais`); `firestore.rules` (lista em `itemValido`);
+  `firestore-tests/locais.test.js` (novo, entra no `npm test`); `firestore-tests/package.json`;
+  testes e casos que usam nomes de local que somem
+  (`grep -rn "'Biblioteca'\|Reitoria\|Ginásio\|Passarela\|Auditório\|Piscina\|Estacionamento\|Centro de Informação\|Medicina\|Odontologia\|Enfermagem\|Arquitetura\|Pós-Graduação\|Clínica\|Praça" lib test firestore-tests`).
+- **O que muda:** as duas listas = a D11, iguais e na mesma ordem.
+- **Interface do teste novo:** `locais.test.js` lê os dois arquivos como texto, extrai a lista de
+  cada um (a `const locais = [...]` do Dart e o `dados.local in [...]` das regras) e exige as duas
+  iguais e iguais à D11. Ele impede que uma mude sem a outra.
+- **Decisão:** nome de teste que sumir vira o novo mais próximo (por exemplo, `Biblioteca` →
+  `Bloco A`, `Passarela` → `Bloco B`), sem recriar o antigo. Os `itens_exemplo` também.
+- **Testes:** `locais.test.js` primeiro (falha com as listas antigas), depois V1, V2 e V3.
+- **Commit:** `feat: lista de locais passada pelo Cauê`.
+
+### Tarefa 5.2 — "Outro" com texto livre (`localDetalhe`)
+
+- **Arquivos:** `firestore.rules`; `lib/modelos/item.dart`; `lib/itens.dart`;
+  `lib/telas/publicar.dart`; `lib/telas/detalhe.dart`; `firestore-tests/rules.test.js`;
+  `test/` (widget de publicar); `firestore-tests/web-ct.test.js` (um caso novo).
+- **Interfaces:**
+  - Firestore, `itens/{id}`: campo **opcional** `localDetalhe` (string). Regra: existe **se e só
+    se** `local == 'Outro'`, e então `textoObrigatorio(localDetalhe, 80)`. Entra no `hasOnly` da
+    criação e no `affectedKeys().hasOnly([...])` do `update`. Trocar de `Outro` para um local da
+    lista apaga o campo (`FieldValue.delete()`).
+  - `Item`: `final String? localDetalhe;` no `fromMap`/`toMap` (ausente → `null`).
+  - `Itens.publicar(...)` e o editar: novo parâmetro `String? localDetalhe`. Com `local == 'Outro'`,
+    exige texto não vazio de até 80 letras (senão `ArgumentError`); com outro local, ignora e
+    apaga.
+  - `TelaPublicar`: com `Outro` escolhido, aparece embaixo um campo `Onde?` (`Key('localDetalhe')`),
+    com o validador `Diga onde foi.` (vazio) e o limite de 80. Editando, o campo abre com o texto
+    salvo.
+  - Detalhe: o local aparece como `Outro: <texto>`.
+  - Filtro: não muda. O chip `Outro` junta todos esses itens.
+- **Testes** (primeiro, e ver falhar):
+  - `rules.test.js`: `Outro` sem `localDetalhe` → nega; `Outro` com o texto → passa; `Bloco A` com
+    `localDetalhe` → nega; texto com 81 letras → nega; trocar `Outro` → `Bloco A` apagando o campo
+    → passa.
+  - Flutter: escolher `Outro` mostra `Onde?`; salvar vazio mostra `Diga onde foi.`; com texto,
+    `publicar` recebe o `localDetalhe`.
+  - `web-ct.test.js`: novo caso **CT-46**, "Outro com o lugar digitado": publicar com `Outro` e
+    `perto da cantina`, abrir o detalhe e ver `Outro: perto da cantina`. Entra em `docs/testes.md`.
+  - V1 a V5 (o `test:ct` passa a ter um caso a mais).
+- **Commit:** `feat: local Outro com o lugar digitado`.
+
+### Tarefa 5.3 — Docs dos locais
+
+- **Arquivos:** `docs/testes.md` (CT-44 e o CT-46 novo); `docs/visita-campus.md`;
+  `docs/requisitos.md` (o RF que fala de local); `docs/diagramas/dados.puml` (campo
+  `localDetalhe`) e o `.svg` regerado.
+- **O que muda:** CT-44 ✅ "lista passada pelo Cauê em 26/11/2026 (D11)". `visita-campus.md` ganha
+  no topo uma nota de que a lista veio do Cauê, e não de uma visita, e de que "até o Bloco H" é o
+  que ele lembra.
+- **Commit:** `docs: locais da D11 e o Outro com texto livre`, corpo com `Closes #10`.
 
 **⏸ Ponto de parada da etapa 5.** Com a ordem nova, inclui conferir a URL pública depois do V6 (o CI
 publica sozinho, D10).
@@ -516,7 +567,9 @@ dá para trocar depois).
 - [x] 4.3 Casos do navegador sem verificação
 - [x] 4.4 Docs do login novo
 - [x] ⏸ Etapa 4: push e registro
-- [ ] 5.1 Lista de locais do Cauê; fecha #10
+- [ ] 5.1 Lista nova em `config.dart` e nas regras, com `locais.test.js`
+- [ ] 5.2 "Outro" com texto livre (`localDetalhe`, CT-46)
+- [ ] 5.3 Docs dos locais; fecha #10
 - [ ] ⏸ Etapa 5: push e registro
 - [ ] 6.1 Modo produção no código
 - [ ] 6.2 Projeto real ligado; fecha #5
