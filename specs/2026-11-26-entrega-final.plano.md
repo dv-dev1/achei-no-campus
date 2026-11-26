@@ -1,7 +1,8 @@
 # Plano — entrega final do Achei no Campus
 
 Spec: `specs/2026-11-26-entrega-final.md` (decisões D1 a D9). Responsável: Cauê (`cauedev30`).
-Base: `main` em `1156cce` (26/11/2026). Clone: `C:\Users\Administrator\Desktop\achei-no-campus`.
+Base: `main` em `1156cce` (26/11/2026). Clone: `C:\Users\Administrator\Downloads\Vault_01\workspace-achei-no-campus\repo` (desde 26/11; o do
+Desktop ficou obsoleto). A sessão abre na pasta do workspace, que tem o estado e o contexto.
 
 > Para quem executa: uma tarefa por vez, na ordem, marcando o checklist no fim. O plano diz **o
 > que** fazer, com arquivos, interfaces, testes e "pronto quando"; o código é escrito na
@@ -11,7 +12,7 @@ Base: `main` em `1156cce` (26/11/2026). Clone: `C:\Users\Administrator\Desktop\a
 ## Restrições globais
 
 - Commits em pt-BR, um assunto por commit, autor `cauedev30 <cauefranco01@gmail.com>`, **sem**
-  Co-Authored-By. No comando com `git commit`, use `cd "C:/Users/Administrator/Desktop/achei-no-campus"`
+  Co-Authored-By. No comando com `git commit`, use `cd "C:/Users/Administrator/Downloads/Vault_01/workspace-achei-no-campus/repo"`
   (a hook de autor lê identidade vazia com caminho `/c/...`).
 - **Fechar issue pelo commit (D5):** o GitHub só reconhece palavra-chave em inglês. A última linha do
   corpo da mensagem é `Closes #N` (uma por issue: `Closes #3, closes #4`). Nada de comentário em issue.

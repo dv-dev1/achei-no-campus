@@ -1,6 +1,6 @@
 # Spec — Achei no Campus: tudo o que resta até a entrega
 
-Repo `dv-dev1/achei-no-campus` · clone `C:\Users\Administrator\Desktop\achei-no-campus` ·
+Repo `dv-dev1/achei-no-campus` · clone `C:\Users\Administrator\Downloads\Vault_01\workspace-achei-no-campus\repo` (desde 26/11) ·
 base `main` = `739c025` (CI verde: `test:ct` 28 de 28, `todo 0`).
 
 ## Contexto
