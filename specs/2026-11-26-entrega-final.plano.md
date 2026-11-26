@@ -411,8 +411,8 @@ dá para trocar depois).
 
 ## Checklist
 
-- [ ] 1.1 CT-18 espera o feed
-- [ ] 1.2 `docs/testes.md` e registro de 25/11; fecham #3, #4, #6, #8, #14
+- [x] 1.1 CT-18 espera o feed
+- [x] 1.2 `docs/testes.md` e registro de 25/11; fecham #3, #4, #6, #8, #14
 - [ ] ⏸ Etapa 1: push e registro
 - [ ] 2.1 Falha clara do navegador; fecha #2
 - [ ] ⏸ Etapa 2: push e registro
@@ -440,3 +440,29 @@ dá para trocar depois).
 
 (Preenchido a cada ponto de parada: commits, resultados de V1 a V6, decisões tomadas no caminho e
 pendências.)
+
+### Etapa 1 — 26/11/2026
+
+**Commits:** `93878db` (1.1, CT-18 espera a frase do feed vazio) e `8d2f48d` (1.2, `docs/testes.md`
+com a rodada de 26/11 e a correção do registro do CT-18 no plano de 20/10, fechando #3, #4, #6, #8
+e #14). Sobe junto o `693e7b7`, em que a spec e o plano passam a apontar para o clone no workspace.
+
+**Verificação nesta máquina** (clone novo, `flutter build web` refeito):
+
+| Id | Resultado |
+|---|---|
+| V3 | `tests 30 · pass 30 · fail 0` |
+| V4 | `test:web`: `tests 1 · pass 1 · fail 0` |
+| V5 filtrado em CT-18 | ✔ três vezes seguidas (19,7 s, 19,1 s e 22,3 s) |
+| V5 completo | 23 de 28 ✔. Os 5 ✖ (CT-01, CT-03, CT-04, CT-17 e CT-23) têm o mesmo erro: `Tempo esgotado esperando o Firebase do app carregar.` (`driver.mjs:156`), ou seja, o app não carregou em 20 s. O CT-18 passou na suíte. |
+| V5 nos 5 casos, de novo | CT-01, CT-03, CT-04 e CT-23 ✔. CT-17 ✖ com o mesmo erro; é o único dos cinco que abre duas abas ao mesmo tempo. |
+
+Nenhum dos cinco casos foi tocado nesta etapa, e os 28 passaram no CI do `739c025`. A falha é a
+lentidão desta máquina para carregar o app, não um defeito. O Cauê decidiu: push, e o CI decide (V6).
+
+**Achado: a suíte trava quando o app não carrega a tempo.** O `abrirApp` lança o erro do `pronto()`
+sem fechar o Chrome nem o servidor, porque essa chamada fica fora do `try`. O processo de teste
+então nunca termina e o resumo não sai. Nas duas rodadas foi preciso encerrar à mão os Chromes de
+teste e o processo filho. Por decisão do Cauê, a correção entra na tarefa 2.1, já atualizada acima.
+
+**V6:** a preencher depois do push.
