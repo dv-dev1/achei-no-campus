@@ -199,7 +199,10 @@ e-mail do domínio.
     domínio certo e `email_verified: false`, ler e escrever **passa**. Os casos de domínio errado
     e parecido continuam negando (CT-39).
 - **Testes:** escrever o caso invertido primeiro e ver falhar com a regra atual; mudar a regra; V3.
-- **Pronto quando:** V3 verde; nenhum `email_verified` em `firestore.rules` nem nos dois testes.
+- **Pronto quando:** V3 verde; nenhum `email_verified` em `firestore.rules` nem nos dois testes,
+  exceto no caso do CT-40, que precisa do `email_verified: false` para provar que a regra o ignora.
+  (Corrigido em 26/11/2026: antes, o texto pedia o grep vazio, o que contradizia o próprio caso
+  invertido.)
 - **Commit:** `feat: regras aceitam o domínio acadêmico sem exigir e-mail verificado`.
 
 ### Tarefa 4.2 — App sem verificação
