@@ -434,7 +434,7 @@ dá para trocar depois).
 - [x] 1.2 `docs/testes.md` e registro de 25/11; fecham #3, #4, #6, #8, #14
 - [x] ⏸ Etapa 1: push e registro
 - [x] 2.1 Falha clara do navegador; fecha #2
-- [ ] ⏸ Etapa 2: push e registro
+- [x] ⏸ Etapa 2: push e registro
 - [ ] 3.1 Local inicial só se estiver na lista; fecha #15
 - [ ] ⏸ Etapa 3: push e registro
 - [ ] 4.1 Regras sem `email_verified`
@@ -522,4 +522,6 @@ ficava aberto e o teste travava. Por decisão do Cauê, entrou nesta etapa.
 **Execução:** o subagente em Sonnet fez os commits `18fbb02` e `dac9dc7`. A revisão em Opus aprovou os
 dois e achou o caso do `7055176`.
 
-**V6:** a preencher depois do push.
+**V6:** run `45884375548` (`15ff650`) `success` em 8 min 51 s. `npm test` deu 32 de 32, com
+`skipped 0`: os dois casos novos rodaram no job `firestore`. O `test:web` deu 1 de 1 e o `test:ct`
+28 de 28. A #2 fechou pelo `18fbb02`.
