@@ -353,21 +353,6 @@ export async function abrirApp({ raiz = raizPadrao, limite = 20000 } = {}) {
     recarregar: async () => { await enviar('Page.reload', { ignoreCache: true }); await pronto(); } };
 }
 
-/// Marca o e-mail como verificado pelo endpoint de administrador do emulador de
-/// Auth: o e-mail de verificação não sai de verdade, então é o único caminho.
-export async function verificarEmail(uid) {
-  const projeto = 'demo-achei-no-campus';
-  const resposta = await fetch(
-    `http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/${projeto}/accounts:update`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer owner' },
-      body: JSON.stringify({ localId: uid, emailVerified: true }),
-    },
-  );
-  if (!resposta.ok) throw new Error(`Falha ao verificar o e-mail: ${resposta.status} ${await resposta.text()}`);
-}
-
 /// Apaga todos os documentos do emulador de Firestore. O feed mostra o que
 /// qualquer pessoa publicou, então um caso de filtro só é previsível com o
 /// banco limpo antes dele.
