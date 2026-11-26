@@ -108,6 +108,11 @@ caso que confere a tela sem esperar pode falhar aqui e passar lá (foi o CT-18).
   - Erro lançado por `abrirApp` quando o spawn falha: `Error` com mensagem
     `Não foi possível abrir o navegador em "<caminho>" (<código>). Defina CHROME_BIN com o caminho do Chrome ou do Edge.`
     e `cause` = erro original.
+  - **Limpeza em qualquer falha (acrescentado em 26/11/2026, achado da etapa 1):** se qualquer passo
+    do `abrirApp` falhar depois do spawn, inclusive o `pronto()` (`driver.mjs:322`, hoje fora do
+    `try`), o navegador e o servidor são fechados antes de relançar o erro. Hoje eles ficam abertos,
+    o processo do `node --test` não termina e a suíte trava sem imprimir o resumo. O prazo de 20 s
+    do `pronto()` não muda.
 - **Decisão em aberto:** onde mora o teste. Se `servir()` precisar de `build/web` para subir, o
   teste vai em `web.test.js` (que já roda depois do build); senão, em `navegador.test.js`, que roda
   no `npm test` e no job `firestore` do CI.
@@ -117,7 +122,9 @@ caso que confere a tela sem esperar pode falhar aqui e passar lá (foi o CT-18).
   - V3 (inclui os testes já existentes de `caminhoDoNavegador`);
   - V4 duas vezes: sem `CHROME_BIN` e com `CHROME_BIN` no Edge
     (`C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`), os dois `pass 1`.
-- **Pronto quando:** os três testes acima passam e o `README.md` (linha ~93) diz o que fazer quando
+  - novo caso: com o app sem carregar (por exemplo, servindo uma pasta sem o `build/web`),
+    `abrirApp()` rejeita e o processo do teste termina sozinho, sem Chrome nem servidor abertos;
+- **Pronto quando:** os quatro testes acima passam e o `README.md` (linha ~93) diz o que fazer quando
   aparece a mensagem.
 - **Commit:** `fix: test:web e test:ct avisam logo quando o navegador não abre`, corpo com `Closes #2`.
 
