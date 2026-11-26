@@ -74,9 +74,23 @@ export function caminhoDoNavegador(plataforma = process.platform, env = process.
   throw new Error(`Nenhum Chrome ou Edge encontrado em: ${lista.join(', ')}. Defina CHROME_BIN com o caminho do navegador.`);
 }
 
-async function conectar(perfil) {
+/// O `ENOENT` cru do spawn não diz o que fazer: a mensagem aponta o `CHROME_BIN`.
+export function erroDoNavegador(caminho, erro) {
+  return new Error(
+    `Não foi possível abrir o navegador em "${caminho}" (${erro.code}). Defina CHROME_BIN com o caminho do Chrome ou do Edge.`,
+    { cause: erro },
+  );
+}
+
+/// `falhaDoNavegador` devolve o erro do spawn, se houve: sem isso a espera pela
+/// porta de depuração só acabaria no limite, com o navegador que nunca abriu.
+async function conectar(perfil, falhaDoNavegador = () => undefined) {
   const porta = await esperarPor(
-    async () => (await readFile(join(perfil, 'DevToolsActivePort'), 'utf8').catch(() => '')).split('\n')[0],
+    async () => {
+      const falha = falhaDoNavegador();
+      if (falha) throw falha;
+      return (await readFile(join(perfil, 'DevToolsActivePort'), 'utf8').catch(() => '')).split('\n')[0];
+    },
     'o navegador abrir a porta de depuração',
   );
   const alvos = await (await fetch(`http://127.0.0.1:${porta}/json/list`)).json();
@@ -90,7 +104,8 @@ async function conectar(perfil) {
 export async function abrirApp() {
   const servidor = await servir();
   const perfil = await mkdtemp(join(tmpdir(), 'achei-web-'));
-  const navegador = spawn(caminhoDoNavegador(), [
+  const caminho = caminhoDoNavegador();
+  const navegador = spawn(caminho, [
     '--headless=new', '--remote-debugging-address=127.0.0.1', '--remote-debugging-port=0',
     `--user-data-dir=${perfil}`, '--no-first-run', '--no-default-browser-check',
     '--window-size=1280,900',
@@ -101,11 +116,11 @@ export async function abrirApp() {
 
   let socket;
   try {
-    socket = await conectar(perfil);
+    socket = await conectar(perfil, () => erroDeInicio && erroDoNavegador(caminho, erroDeInicio));
   } catch (erro) {
     navegador.kill();
     await new Promise((pronto) => servidor.close(pronto));
-    throw erroDeInicio ?? erro;
+    throw erro;
   }
 
   const pendentes = new Map();

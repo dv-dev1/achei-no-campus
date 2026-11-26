@@ -7,7 +7,7 @@ import { dirname, extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import test from 'node:test';
 
-import { caminhoDoNavegador } from './driver.mjs';
+import { caminhoDoNavegador, erroDoNavegador } from './driver.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../build/web');
 const pause = () => new Promise((resolve) => setTimeout(resolve, 100));
@@ -37,7 +37,8 @@ test('Auth permanece no emulador e restaura o usuário após recarregar o build 
   });
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const profile = await mkdtemp(join(tmpdir(), 'achei-chrome-'));
-  const chrome = spawn(caminhoDoNavegador(), [
+  const caminho = caminhoDoNavegador();
+  const chrome = spawn(caminho, [
     '--headless=new', '--remote-debugging-address=127.0.0.1', '--remote-debugging-port=0',
     `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check',
     ...(process.env.CI ? ['--no-sandbox'] : []), 'about:blank',
@@ -47,7 +48,7 @@ test('Auth permanece no emulador e restaura o usuário após recarregar o build 
   let socket;
   try {
     const port = await waitFor(async () => {
-      if (startupError) throw startupError;
+      if (startupError) throw erroDoNavegador(caminho, startupError);
       return (await readFile(join(profile, 'DevToolsActivePort'), 'utf8').catch(() => '')).split('\n')[0];
     });
     const targets = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
