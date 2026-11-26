@@ -9,6 +9,18 @@ Desktop ficou obsoleto). A sessão abre na pasta do workspace, que tem o estado 
 > implementação. Se algo mudar no caminho, atualize esta tarefa (e as seguintes, se mudar um
 > contrato entre etapas) antes de seguir.
 
+## Ordem de execução (mudada em 26/11/2026)
+
+Os números das etapas não mudam, só a ordem. Depois da etapa 2, o Cauê decidiu adiantar o que põe
+o app no ar com link público, porque a apresentação ainda não tem data, mas está perto:
+**1 → 2 → 4 → 6 → 7 → 3 → 5 → 8 → 9**. As dependências continuam valendo: a 6 depois da 4, e a 5
+depois da 3.
+
+Consequência: a 3 e a 5 mudam `lib/` **depois** do primeiro deploy (etapa 7). Por isso, cada uma
+termina com um redeploy do Hosting, com os dois comandos da tarefa 7.1 (build com os
+`--dart-define` e `firebase deploy --only hosting`) e uma olhada rápida na URL pública. Isso entra
+no ponto de parada delas.
+
 ## Restrições globais
 
 - Commits em pt-BR, um assunto por commit, autor `cauedev30 <cauefranco01@gmail.com>`, **sem**
@@ -166,7 +178,8 @@ caso que confere a tela sem esperar pode falhar aqui e passar lá (foi o CT-18).
   como bloqueio.
 - **Commit:** `fix: editar item com local que saiu da lista abre a tela`, corpo com `Closes #15`.
 
-**⏸ Ponto de parada da etapa 3.**
+**⏸ Ponto de parada da etapa 3.** Com a ordem nova, inclui o redeploy do Hosting (ver "Ordem de
+execução").
 
 ---
 
@@ -276,7 +289,8 @@ e-mail do domínio.
 - **Pronto quando:** testes verdes com a lista nova.
 - **Commit:** `feat: lista de locais conferida pelo Cauê`, corpo com `Closes #10`.
 
-**⏸ Ponto de parada da etapa 5.**
+**⏸ Ponto de parada da etapa 5.** Com a ordem nova, inclui o redeploy do Hosting (ver "Ordem de
+execução").
 
 ---
 
