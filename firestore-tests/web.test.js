@@ -22,6 +22,9 @@ async function waitFor(check) {
 }
 
 test('Auth permanece no emulador e restaura o usuário após recarregar o build web', { timeout: 90000 }, async () => {
+  // Antes do servidor: se nenhum navegador for achado, o erro já cita o
+  // CHROME_BIN, e não sobra servidor aberto segurando o processo.
+  const caminho = caminhoDoNavegador();
   const mime = { '.html': 'text/html', '.js': 'text/javascript', '.json': 'application/json', '.wasm': 'application/wasm' };
   const server = createServer(async (request, response) => {
     const path = new URL(request.url, 'http://localhost').pathname;
@@ -37,7 +40,6 @@ test('Auth permanece no emulador e restaura o usuário após recarregar o build 
   });
   await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
   const profile = await mkdtemp(join(tmpdir(), 'achei-chrome-'));
-  const caminho = caminhoDoNavegador();
   const chrome = spawn(caminho, [
     '--headless=new', '--remote-debugging-address=127.0.0.1', '--remote-debugging-port=0',
     `--user-data-dir=${profile}`, '--no-first-run', '--no-default-browser-check',
