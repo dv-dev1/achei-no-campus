@@ -9,7 +9,7 @@ import { tmpdir } from 'node:os';
 import { dirname, extname, join, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const raiz = resolve(dirname(fileURLToPath(import.meta.url)), '../build/web');
+const raizPadrao = resolve(dirname(fileURLToPath(import.meta.url)), '../build/web');
 const tipos = {
   '.html': 'text/html',
   '.js': 'text/javascript',
@@ -35,7 +35,7 @@ export async function esperarPor(verificar, descricao, limite = 20000) {
   throw new Error(`Tempo esgotado esperando ${descricao}.`);
 }
 
-function servir() {
+function servir(raiz) {
   const servidor = createServer(async (pedido, resposta) => {
     const caminho = new URL(pedido.url, 'http://localhost').pathname;
     const arquivo = resolve(raiz, `.${caminho === '/' ? '/index.html' : caminho}`);
@@ -101,25 +101,40 @@ async function conectar(perfil, falhaDoNavegador = () => undefined) {
 
 /// Abre uma aba com o app servido do `build/web`. Cada aba tem perfil próprio,
 /// então duas abas valem como dois aparelhos diferentes no mesmo teste.
-export async function abrirApp() {
-  const servidor = await servir();
-  const perfil = await mkdtemp(join(tmpdir(), 'achei-web-'));
-  const caminho = caminhoDoNavegador();
-  const navegador = spawn(caminho, [
-    '--headless=new', '--remote-debugging-address=127.0.0.1', '--remote-debugging-port=0',
-    `--user-data-dir=${perfil}`, '--no-first-run', '--no-default-browser-check',
-    '--window-size=1280,900',
-    ...(process.env.CI ? ['--no-sandbox'] : []), 'about:blank',
-  ], { stdio: 'ignore' });
-  let erroDeInicio;
-  navegador.on('error', (erro) => { erroDeInicio = erro; });
-
+export async function abrirApp({ raiz = raizPadrao, limite = 20000 } = {}) {
+  const servidor = await servir(resolve(raiz));
+  let perfil;
+  let navegador;
   let socket;
+  let erroDeInicio;
+
+  // Serve para o fim normal e para qualquer falha na abertura: sem fechar o
+  // navegador e o servidor, o processo do teste não termina e a suíte trava.
+  const fechar = async () => {
+    socket?.close();
+    if (navegador) {
+      navegador.kill();
+      await new Promise((resolvido) => (
+        navegador.exitCode !== null || navegador.signalCode !== null || erroDeInicio ? resolvido() : navegador.once('exit', resolvido)
+      ));
+    }
+    await new Promise((resolvido) => servidor.close(resolvido));
+    if (perfil) await rm(perfil, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
+  };
+
   try {
+    perfil = await mkdtemp(join(tmpdir(), 'achei-web-'));
+    const caminho = caminhoDoNavegador();
+    navegador = spawn(caminho, [
+      '--headless=new', '--remote-debugging-address=127.0.0.1', '--remote-debugging-port=0',
+      `--user-data-dir=${perfil}`, '--no-first-run', '--no-default-browser-check',
+      '--window-size=1280,900',
+      ...(process.env.CI ? ['--no-sandbox'] : []), 'about:blank',
+    ], { stdio: 'ignore' });
+    navegador.on('error', (erro) => { erroDeInicio = erro; });
     socket = await conectar(perfil, () => erroDeInicio && erroDoNavegador(caminho, erroDeInicio));
   } catch (erro) {
-    navegador.kill();
-    await new Promise((pronto) => servidor.close(pronto));
+    await fechar();
     throw erro;
   }
 
@@ -162,15 +177,16 @@ export async function abrirApp() {
 
   // Sem isto o Flutter nunca monta o DOM de semantics, e não há o que clicar.
   const ligarSemantics = async () => {
-    await esperarPor(() => avaliar(`!!document.querySelector('flt-semantics-placeholder')`), 'o placeholder de semantics');
+    await esperarPor(() => avaliar(`!!document.querySelector('flt-semantics-placeholder')`), 'o placeholder de semantics', limite);
     await avaliar(`document.querySelector('flt-semantics-placeholder').click()`);
-    await esperarPor(() => avaliar(`document.querySelectorAll('flt-semantics').length > 0`), 'a árvore de semantics');
+    await esperarPor(() => avaliar(`document.querySelectorAll('flt-semantics').length > 0`), 'a árvore de semantics', limite);
   };
 
   const pronto = async () => {
     await esperarPor(
       () => avaliar('typeof firebase_auth !== "undefined" && firebase_core.getApps().length > 0'),
       'o Firebase do app carregar',
+      limite,
     );
     await avaliar('firebase_auth.getAuth().authStateReady()');
     if (pedidosRemotos.length > 0) throw new Error(`O app acessou Firebase real: ${pedidosRemotos.join(', ')}`);
@@ -323,18 +339,15 @@ export async function abrirApp() {
     if (escrito !== texto) throw new Error(`Campo ${JSON.stringify(rotulo)} ficou com ${JSON.stringify(escrito)}, não com ${JSON.stringify(texto)}.`);
   };
 
-  const fechar = async () => {
-    socket.close();
-    navegador.kill();
-    await new Promise((resolvido) => navegador.exitCode !== null ? resolvido() : navegador.once('exit', resolvido));
-    await new Promise((resolvido) => servidor.close(resolvido));
-    await rm(perfil, { recursive: true, force: true, maxRetries: 3, retryDelay: 100 });
-  };
-
-  await enviar('Network.enable');
-  await enviar('Runtime.enable');
-  await enviar('Page.navigate', { url: `http://127.0.0.1:${servidor.address().port}` });
-  await pronto();
+  try {
+    await enviar('Network.enable');
+    await enviar('Runtime.enable');
+    await enviar('Page.navigate', { url: `http://127.0.0.1:${servidor.address().port}` });
+    await pronto();
+  } catch (erro) {
+    await fechar();
+    throw erro;
+  }
 
   return { avaliar, enviar, rotulos, esperarRotulo, esperarTexto, tem, tocar, tocarComecandoCom, tocarContendo, digitar, digitarSubstituindo, valorDe, fechar, pedidosRemotos, errosDoConsole,
     recarregar: async () => { await enviar('Page.reload', { ignoreCache: true }); await pronto(); } };

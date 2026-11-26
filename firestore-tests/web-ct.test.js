@@ -260,16 +260,19 @@ test('CT-23 — filtro sem resultado oferece limpar', { timeout: 180000 }, () =>
 test('CT-17 — feed atualiza em tempo real em outra aba', { timeout: 240000 }, async () => {
   await limparBanco();
   const primeira = await abrirApp();
-  const segunda = await abrirApp();
   try {
-    await entrarVerificado(primeira, email('ct17a'));
-    await entrarVerificado(segunda, email('ct17b'));
-    await publicar(primeira, { titulo: 'Carteira marrom' });
-    // Sem recarregar a segunda aba: o item tem que chegar pelo stream.
-    await segunda.esperarTexto('Carteira marrom');
+    const segunda = await abrirApp();
+    try {
+      await entrarVerificado(primeira, email('ct17a'));
+      await entrarVerificado(segunda, email('ct17b'));
+      await publicar(primeira, { titulo: 'Carteira marrom' });
+      // Sem recarregar a segunda aba: o item tem que chegar pelo stream.
+      await segunda.esperarTexto('Carteira marrom');
+    } finally {
+      await segunda.fechar();
+    }
   } finally {
     await primeira.fechar();
-    await segunda.fechar();
   }
 });
 
@@ -302,12 +305,15 @@ const quantasConversas = () => contarColecao('conversas');
 /// Duas abas com perfis separados valem como dois aparelhos no mesmo caso.
 async function comDoisApps(corpo) {
   const dono = await abrirApp();
-  const visitante = await abrirApp();
   try {
-    await corpo(dono, visitante);
+    const visitante = await abrirApp();
+    try {
+      await corpo(dono, visitante);
+    } finally {
+      await visitante.fechar();
+    }
   } finally {
     await dono.fechar();
-    await visitante.fechar();
   }
 }
 
