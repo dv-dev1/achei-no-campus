@@ -352,6 +352,7 @@ O V5 exige o V3 antes, porque o `driver.mjs` serve o `build/web`. O Chrome está
 - [x] 4.3 CT-14 e CT-16 na web
 - [x] 4.4 README "Fotos"
 - [x] ⏸ Etapa 4: push e registro (#6)
+- [x] 1.6 Retomada da #3 (25/11): roteiro do CT-28 e do CT-29/30 ajustado, sem `todo`
 
 ## Registro da execução
 
@@ -490,14 +491,38 @@ operável pela automação); o resto do caminho é o do app: redimensionar, envi
 **Para o Cauê:** apagar no Media Library do Cloudinary as imagens enviadas nos testes de
 20/10 (três na raiz e três em `achei/`).
 
+### Retomada da #3 (25/11/2026)
+
+O reteste de 21/10 (`b1c16f5`, em `docs/testes.md`) manteve a #3 aberta com o CT-28 e o
+CT-29/30 em `todo`. Os dois erros daquela rodada são os do item 1 da etapa 1, acima: o roteiro
+procurava `Mensagens` e `1` por igualdade, e com não lidas o rótulo da aba é `1\nMensagens`.
+O ajuste do roteiro não tinha entrado.
+
+Reproduzido em `b1c16f5`, com build web novo: sem mexer no roteiro, o CT-28 esgota o tempo
+esperando `"Mensagens"` e o CT-29/30 esperando `"1"`, como no reteste. Com o ajuste da etapa 1,
+os dois passam. O app não mudou: a #3 já estava corrigida desde `99b7646`.
+
+**Mudança:** `firestore-tests/web-ct.test.js` recebe o ajuste e os dois casos perdem o `todo`.
+
+**Resultado:** `npm run test:ct` com `tests 28 · pass 27 · fail 1 · todo 0` (CT-28 em 38 s,
+CT-29/30 em 31 s). A falha é o CT-18, fora da #3, descrito abaixo.
+
+**CT-18 (feed vazio) falha em `b1c16f5`**, também sozinho, nas três vezes em que rodou. O caso
+confere `tem('Nenhum item ainda.')` logo depois de entrar, sem esperar o feed carregar. Na
+falha, a tela só tem a barra de cima e as abas, ou seja, o feed ainda está no carregando.
+Trocando a conferência por `esperarTexto('Nenhum item ainda.')`, o caso passou (troca desfeita;
+não entrou no commit). O app mostra a frase (`lib/telas/feed.dart:147`), e nenhum commit desde
+20/10 mexeu nesse ramo do feed.
+
 ### Pendências de outras pessoas
 
 | Quem | O quê |
 |---|---|
-| Lúcio | Ajustar o roteiro do CT-28 e do CT-29/30 (acima); retestar e fechar a #3 e a #4 |
+| Lúcio | ~~Ajustar o roteiro do CT-28 e do CT-29/30~~ (feito pelo Cauê em 25/11, ver a retomada da #3); fechar a #3 e a #4 |
+| Lúcio | CT-18: esperar a frase do feed vazio em vez de conferir na hora (ver a retomada da #3) |
 | Lúcio | Revisar requisitos e diagramas (#9), agora liberada pela #8 |
 | Lúcio | CT-14 a CT-16 no Android (#11) e reteste da coluna W |
 | Daniel | Usar `tbeq7obd` e `achei_unsigned` nos builds da #5, #7 e #11 |
 | Daniel | Defeito achado ao rodar `flutter run -d chrome` (modo debug): o botão **Já verifiquei** não faz nada. `_verificar` em `lib/main.dart:95` usa `setState(() => _acesso = ...)`, e a seta devolve o `Future`; no debug o Flutter lança "setState() callback argument returned a Future" antes de redesenhar. No build release a checagem não existe, por isso CI e `test:ct` não pegam. Correção: `setState(() { _acesso = widget.sessao.prepararAcesso(); });`. Contorno até lá: `flutter run -d chrome --release` |
 | Daniel | O CI do `d7f7a17` (a #14) ficou mais de 2h30 "em andamento"; o do `6f39942`, logo depois, terminou em 9 min. Vale cancelar o travado |
-| Daniel | Com a #3 e a #4, o `test:ct` do CI passa de `todo 4` para `todo 2` |
+| Daniel | Com a #3 e a #4, o `test:ct` do CI passa de `todo 4` para `todo 2`; com a retomada da #3 (25/11), para `todo 0`. O CI de `b1c16f5` não chegou ao fim: o passo `test:ct` passou dos 20 minutos (#14) |
