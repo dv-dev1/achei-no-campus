@@ -295,7 +295,8 @@ o cadastro grava o nome.
     no plano grátis; SAML/OIDC no Identity Platform, pago).
   - CT-40 renomeado "Domínio certo basta, sem verificação" ✅ (`rules.test.js`).
   - README: a mesma limitação numa seção curta "Limitações conhecidas".
-- **Testes:** `java -jar C:\Users\Administrator\development\plantuml\plantuml.jar -tsvg docs/diagramas/*.puml`
+- **Testes:** `java -jar C:\Users\Administrator\development\plantuml\plantuml-1.2026.9.jar -charset UTF-8 -tsvg docs/diagramas/*.puml`
+  (corrigido em 26/11/2026: o arquivo não se chama `plantuml.jar`)
   e conferir que o diff dos `.svg` só troca os textos; `grep -rn "verific" docs README.md` só
   sobra onde fala da decisão D1.
 - **Pronto quando:** nenhum doc vivo descreve a verificação como parte do app.
@@ -511,9 +512,9 @@ dá para trocar depois).
 - [ ] ⏸ Etapa 3: push e registro
 - [x] 4.1 Regras sem `email_verified`
 - [x] 4.2 App sem verificação
-- [ ] 4.2b Cadastro grava o nome digitado no perfil
-- [ ] 4.3 Casos do navegador sem verificação
-- [ ] 4.4 Docs do login novo
+- [x] 4.2b Cadastro grava o nome digitado no perfil
+- [x] 4.3 Casos do navegador sem verificação
+- [x] 4.4 Docs do login novo
 - [ ] ⏸ Etapa 4: push e registro
 - [ ] 5.1 Lista de locais do Cauê; fecha #10
 - [ ] ⏸ Etapa 5: push e registro
@@ -598,3 +599,48 @@ dois e achou o caso do `7055176`.
 **V6:** run `45884375548` (`15ff650`) `success` em 8 min 51 s. `npm test` deu 32 de 32, com
 `skipped 0`: os dois casos novos rodaram no job `firestore`. O `test:web` deu 1 de 1 e o `test:ct`
 28 de 28. A #2 fechou pelo `18fbb02`.
+
+### Etapa 4 — 26/11/2026
+
+**Antes e durante:** a ordem mudou para 1 → 2 → 4 → 6 → 7 → 3 → 5 → 8 → 9 (`b7299a5`), e a
+hospedagem passou para o GitHub Pages (D10, `91d9ff2`). Os dois são decisões do Cauê.
+
+**Commits:**
+
+| Tarefa | Commit | O quê |
+|---|---|---|
+| 4.1 | `f61ead5` | `aluno()` sem `email_verified`; o caso do CT-40 inverteu e passa com `email_verified: false` |
+| 4.2 | `dca7ee4` | cadastro direto no feed; saíram `TelaVerificar`, `reenviarVerificacao` e o `UsuarioVerificavel`; `avisoDominio` em `lib/config.dart` |
+| 4.2b | `45919ff` | o cadastro grava o nome digitado no perfil (tarefa nova, `e703482`) |
+| 4.3 | `4b2f9a6` | `test:ct` sem verificação: `cadastrar` espera o feed; CT-04 saiu; CT-01 confere o nome no perfil |
+| 4.4 | `42f9cf5`, `4d38c9d` | requisitos, testes, diagramas, README com "Limitações conhecidas"; nota de histórico nos dois docs de planejamento de outubro |
+
+**Mudanças no plano durante a etapa:**
+- **4.1:** o "pronto quando" pedia o grep de `email_verified` vazio, mas o próprio caso do CT-40 precisa
+  do claim. Corrigido (`b8344c7`).
+- **4.2:** sobrou `sendEmailVerification` em `test/sessao_test.dart`, no override do espião que prova
+  que o cadastro **não** envia e-mail. É o mesmo caso da 4.1; fica.
+- **4.2b, achada na revisão da 4.2:** sem a tela de verificação, o portão criava o perfil antes do
+  `updateDisplayName`, e a conta nova ficava com o pedaço do e-mail como nome. Confirmado no navegador
+  3 de 3 (`sonda1.1795723009781` no lugar de "Lúcia Tester"). O Cauê escolheu a correção: o cadastro
+  grava o nome.
+- **4.3:** sem a `TelaVerificar`, o "Sair" só existe no Perfil. Por isso o CT-05 e o CT-07 tocam em
+  **Perfil** antes, como o CT-10. Sobra `verificar` no `driver.mjs`, mas só como nome de parâmetro do
+  `esperarPor`.
+- **4.4:** o PlantUML é `plantuml-1.2026.9.jar` e não `plantuml.jar`; corrigido no plano. Além da
+  lista, entraram o `docs/feed.md:33` e a nota em `docs/escopo-detalhado.md` e em
+  `docs/divisao-de-tarefas.md`.
+
+**Verificação:**
+
+| Id | Resultado |
+|---|---|
+| V1 | `No issues found!` |
+| V2 | `+85 ~1: All tests passed!` (o pulado já existia) |
+| V3 | `tests 32 · pass 32 · fail 0` |
+| V4 | `pass 1`, depois do build com 4.2 e 4.2b |
+| V5 | `tests 27 · pass 27 · fail 0 · todo 0` em 476 s, sem repetição. Com o nome esperado trocado de propósito por um errado, o CT-01 falhou (`actual: 'Lúcia Tester'`), o que prova que a conferência pega o defeito |
+
+**Execução:** um subagente em Sonnet por tarefa, e revisão em Opus no fim de cada uma e no fim da etapa.
+
+**V6:** a preencher depois do push.
