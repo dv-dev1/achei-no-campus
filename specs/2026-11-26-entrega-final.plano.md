@@ -413,7 +413,7 @@ dá para trocar depois).
 
 - [x] 1.1 CT-18 espera o feed
 - [x] 1.2 `docs/testes.md` e registro de 25/11; fecham #3, #4, #6, #8, #14
-- [ ] ⏸ Etapa 1: push e registro
+- [x] ⏸ Etapa 1: push e registro
 - [ ] 2.1 Falha clara do navegador; fecha #2
 - [ ] ⏸ Etapa 2: push e registro
 - [ ] 3.1 Local inicial só se estiver na lista; fecha #15
@@ -465,4 +465,6 @@ sem fechar o Chrome nem o servidor, porque essa chamada fica fora do `try`. O pr
 então nunca termina e o resumo não sai. Nas duas rodadas foi preciso encerrar à mão os Chromes de
 teste e o processo filho. Por decisão do Cauê, a correção entra na tarefa 2.1, já atualizada acima.
 
-**V6:** a preencher depois do push.
+**V6:** run `45879909965` (`e64c7a4`) `success` em 8 min 40 s. `npm test` deu 30 de 30, o
+`test:web` 1 de 1 e o `test:ct` 28 de 28, com `todo 0`. No CI, os 5 casos que falharam aqui
+passaram. As issues #3, #4, #6, #8 e #14 fecharam pelo `8d2f48d`.
