@@ -238,6 +238,32 @@ e-mail do domínio.
 - **Pronto quando:** V1 e V2 verdes; `grep -rn "emailVerified\|sendEmailVerification\|TelaVerificar\|Já verifiquei" lib test` vazio.
 - **Commit:** `feat: cadastro entra direto no app, sem verificação por e-mail`.
 
+### Tarefa 4.2b — O cadastro grava o nome digitado no perfil (acrescentada em 26/11/2026)
+
+Achado da revisão da 4.2, confirmado no navegador 3 de 3. Sem a tela de verificação, o
+`createUserWithEmailAndPassword` dispara o `authStateChanges`, e o portão roda o
+`prepararAcesso()` antes de o `cadastrar` terminar o `updateDisplayName`. O perfil nasce com o
+pedaço do e-mail (`sonda1.1795723009781`) no lugar de "Lúcia Tester", e esse nome vai para todo
+item publicado (`autorNome`). Antes da D1, a tela de verificação segurava o portão. O Cauê decidiu:
+o cadastro grava o nome.
+
+- **Arquivos:** `lib/sessao.dart`; `test/sessao_test.dart`.
+- **Interfaces:**
+  - `Sessao.cadastrar(nome, email, senha)`: depois do `updateDisplayName`, grava o nome no perfil
+    `usuarios/{uid}` numa transação. Se o perfil não existe, cria com
+    `{nome, curso: '', criadoEm: serverTimestamp()}`, igual ao `prepararAcesso`. Se existe (o
+    portão chegou antes), atualiza só `{nome}`. As regras atuais permitem os dois: no `update`,
+    `affectedKeys` fica só em `nome`.
+  - `prepararAcesso()` não muda: ele continua criando o perfil quando falta, para quem já tinha
+    conta.
+- **Testes** (primeiro, e ver falhar):
+  - `sessao_test.dart`: com o perfil já criado com o pedaço do e-mail (simulando o portão),
+    `cadastrar` deixa `nome` igual ao digitado e mantém `curso` e `criadoEm`;
+  - `sessao_test.dart`: sem perfil, `cadastrar` cria com o nome digitado;
+  - V1, V2. A prova no navegador é o CT-01 da 4.3.
+- **Pronto quando:** V1 e V2 verdes, e os dois casos novos vistos falhando antes.
+- **Commit:** `fix: cadastro grava o nome digitado no perfil`.
+
 ### Tarefa 4.3 — Casos do navegador sem verificação
 
 - **Arquivos:** `firestore-tests/web-ct.test.js`; `firestore-tests/driver.mjs:326-341`.
@@ -248,6 +274,8 @@ e-mail do domínio.
     `entrarVerificado` passam a usar `cadastrar`.
 - **Casos que mudam de sentido (mantêm o número):**
   - CT-01 "cadastro com e-mail do domínio certo": confere o feed (`Publicar`) e o e-mail logado.
+    Também confere, pelo emulador (REST do Firestore com `Authorization: Bearer owner`), que
+    `usuarios/{uid}.nome` é o nome digitado, e não o pedaço do e-mail (prova da 4.2b).
   - CT-04: caso removido do arquivo (em `docs/testes.md` vira ➖ "removido por D1, 26/11/2026").
   - CT-05 "entrar com conta existente": cadastrar, sair, entrar com a mesma senha, feed.
   - CT-07 "senha errada": cadastrar, sair, entrar com senha errada, mensagem de erro.
@@ -481,8 +509,9 @@ dá para trocar depois).
 - [x] ⏸ Etapa 2: push e registro
 - [ ] 3.1 Local inicial só se estiver na lista; fecha #15
 - [ ] ⏸ Etapa 3: push e registro
-- [ ] 4.1 Regras sem `email_verified`
-- [ ] 4.2 App sem verificação
+- [x] 4.1 Regras sem `email_verified`
+- [x] 4.2 App sem verificação
+- [ ] 4.2b Cadastro grava o nome digitado no perfil
 - [ ] 4.3 Casos do navegador sem verificação
 - [ ] 4.4 Docs do login novo
 - [ ] ⏸ Etapa 4: push e registro
