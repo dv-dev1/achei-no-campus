@@ -107,7 +107,7 @@ class _PortaoState extends State<_Portao> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text('Use seu e-mail @cs.unipe.edu.br.'),
+              const Text(avisoDominio),
               TextButton(
                 onPressed: widget.sessao.sair,
                 child: const Text('Sair'),
@@ -149,10 +149,8 @@ class _PortaoState extends State<_Portao> {
             ),
           );
         }
-        if (snapshot.data != true) {
-          return TelaVerificar(sessao: widget.sessao, aoVerificar: _verificar);
-        }
-        // Logado e verificado: abre as abas (Feed, Mensagens, Meus itens).
+        if (snapshot.data != true) return TelaEntrar(sessao: widget.sessao);
+        // Logado com e-mail do domínio: abre as abas (Feed, Mensagens, Meus itens).
         return widget.destino?.call() ?? TelaInicio(sessao: widget.sessao);
       },
     );

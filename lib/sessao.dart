@@ -12,14 +12,8 @@ class Sessao {
   final FirebaseFirestore firestore;
   User? get usuario => auth.currentUser;
   Future<bool> prepararAcesso() async {
-    await usuario?.reload();
     final user = usuario;
-    if (user == null ||
-        !user.emailVerified ||
-        !emailPermitido(user.email ?? '')) {
-      return false;
-    }
-    await user.getIdToken(true);
+    if (user == null || !emailPermitido(user.email ?? '')) return false;
     final ref = firestore.collection('usuarios').doc(user.uid);
     await firestore.runTransaction((transaction) async {
       if (!(await transaction.get(ref)).exists) {
@@ -48,7 +42,6 @@ class Sessao {
       password: senha,
     );
     await credencial.user!.updateDisplayName(nome.trim());
-    await credencial.user!.sendEmailVerification();
   }
 
   Future<void> entrar(String email, String senha) async {
@@ -62,10 +55,8 @@ class Sessao {
   Future<void> salvarPerfil(String nome, String curso) async {
     _validarPerfil(nome, curso);
     final user = usuario;
-    if (user == null ||
-        !user.emailVerified ||
-        !emailPermitido(user.email ?? '')) {
-      throw StateError('Entre com um e-mail acadêmico verificado.');
+    if (user == null || !emailPermitido(user.email ?? '')) {
+      throw StateError('Entre com seu e-mail acadêmico.');
     }
     await firestore.collection('usuarios').doc(user.uid).update({
       'nome': nome.trim(),
@@ -73,19 +64,11 @@ class Sessao {
     });
   }
 
-  Future<void> reenviarVerificacao() async {
-    final user = usuario;
-    if (user == null) {
-      throw StateError('Entre novamente para verificar seu e-mail.');
-    }
-    await user.sendEmailVerification();
-  }
-
   Future<void> sair() => auth.signOut();
 
   void _validarEmail(String email) {
     if (!emailPermitido(email)) {
-      throw ArgumentError('Use seu e-mail @cs.unipe.edu.br.');
+      throw ArgumentError(avisoDominio);
     }
   }
 

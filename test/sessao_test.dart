@@ -1,25 +1,25 @@
 import 'package:achei_no_campus/sessao.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 // User muda no reload; a anotação de imutabilidade vem do mock.
 // ignore: must_be_immutable
-class UsuarioVerificavel extends MockUser {
-  UsuarioVerificavel({this.verificado = false})
-    : super(uid: 'ana', email: 'ana@cs.unipe.edu.br', displayName: 'Ana');
+class UsuarioEspia extends MockUser {
+  UsuarioEspia()
+    : super(
+        uid: 'ana',
+        email: 'ana@cs.unipe.edu.br',
+        displayName: 'Ana',
+        isEmailVerified: false,
+      );
 
-  bool verificado;
-  bool verificarNoReload = false;
   final eventos = <String>[];
-
-  @override
-  bool get emailVerified => verificado;
 
   @override
   Future<void> reload() async {
     eventos.add('reload');
-    if (verificarNoReload) verificado = true;
   }
 
   @override
@@ -34,39 +34,61 @@ class UsuarioVerificavel extends MockUser {
   }
 }
 
+// O mock cria um usuário novo no cadastro; aqui o cadastro devolve o espião.
+class AuthComEspia extends MockFirebaseAuth {
+  AuthComEspia(UsuarioEspia espia) : super(mockUser: espia);
+
+  @override
+  Future<UserCredential> createUserWithEmailAndPassword({
+    required String email,
+    required String password,
+  }) => signInWithEmailAndPassword(email: email, password: password);
+}
+
 void main() {
-  test('não cria perfil nem libera feed antes da verificação', () async {
-    final user = UsuarioVerificavel();
+  test('cadastro não envia e-mail e prepararAcesso cria o perfil na primeira entrada', () async {
+    final espia = UsuarioEspia();
     final firestore = FakeFirebaseFirestore();
-    final sessao = Sessao(
-      auth: MockFirebaseAuth(mockUser: user, signedIn: true),
-      firestore: firestore,
-    );
-    expect(await sessao.prepararAcesso(), isFalse);
+    final sessao = Sessao(auth: AuthComEspia(espia), firestore: firestore);
+    await sessao.cadastrar('Ana', 'ana@cs.unipe.edu.br', 'senha123');
+    expect(espia.eventos, isNot(contains('verificacao')));
     expect((await firestore.collection('usuarios').get()).docs, isEmpty);
+
+    expect(await sessao.prepararAcesso(), isTrue);
+    expect(espia.eventos, isNot(contains('verificacao')));
+    expect(espia.eventos, isNot(contains('token:true')));
+    final perfil = (await firestore.collection('usuarios').doc('ana').get())
+        .data()!;
+    expect(perfil['nome'], 'Ana');
+    expect(perfil['curso'], '');
+    expect(perfil['criadoEm'], isNotNull);
   });
 
   test(
-    'verificação externa exige reload e token novo antes do perfil',
+    'prepararAcesso recusa quem não está logado ou tem outro domínio',
     () async {
-      final user = UsuarioVerificavel()..verificarNoReload = true;
       final firestore = FakeFirebaseFirestore();
-      final sessao = Sessao(
-        auth: MockFirebaseAuth(mockUser: user, signedIn: true),
+      final deslogado = Sessao(auth: MockFirebaseAuth(), firestore: firestore);
+      expect(await deslogado.prepararAcesso(), isFalse);
+      final externo = Sessao(
+        auth: MockFirebaseAuth(
+          mockUser: MockUser(uid: 'bia', email: 'bia@gmail.com'),
+          signedIn: true,
+        ),
         firestore: firestore,
       );
-      expect(await sessao.prepararAcesso(), isTrue);
-      expect(user.eventos.take(2), ['reload', 'token:true']);
-      final perfil = (await firestore.collection('usuarios').doc('ana').get())
-          .data()!;
-      expect(perfil['nome'], 'Ana');
-      expect(perfil['curso'], '');
-      expect(perfil['criadoEm'], isNotNull);
+      expect(await externo.prepararAcesso(), isFalse);
+      expect((await firestore.collection('usuarios').get()).docs, isEmpty);
     },
   );
 
   test('novo acesso preserva perfil já editado', () async {
-    final user = UsuarioVerificavel(verificado: true);
+    final user = MockUser(
+      uid: 'ana',
+      email: 'ana@cs.unipe.edu.br',
+      displayName: 'Ana',
+      isEmailVerified: false,
+    );
     final firestore = FakeFirebaseFirestore();
     final sessao = Sessao(
       auth: MockFirebaseAuth(mockUser: user, signedIn: true),
@@ -101,14 +123,14 @@ void main() {
     );
   });
 
-  test('reenviar verificação e sair atuam na sessão atual', () async {
-    final user = UsuarioVerificavel();
+  test('sair encerra a sessão atual', () async {
     final sessao = Sessao(
-      auth: MockFirebaseAuth(mockUser: user, signedIn: true),
+      auth: MockFirebaseAuth(
+        mockUser: MockUser(uid: 'ana', email: 'ana@cs.unipe.edu.br'),
+        signedIn: true,
+      ),
       firestore: FakeFirebaseFirestore(),
     );
-    await sessao.reenviarVerificacao();
-    expect(user.eventos, ['verificacao']);
     await sessao.sair();
     expect(sessao.usuario, isNull);
   });

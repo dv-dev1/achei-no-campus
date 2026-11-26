@@ -17,7 +17,7 @@ class Itens {
     required String local,
     required String fotoUrl,
   }) async {
-    final uid = _uidVerificado();
+    final uid = _uidDoAluno();
     if (!['perdido', 'achado'].contains(tipo) ||
         titulo.trim().isEmpty ||
         titulo.trim().length > 120 ||
@@ -62,23 +62,21 @@ class Itens {
   }
 
   Future<void> devolver(String id) async {
-    await _conferirDono(id, _uidVerificado());
+    await _conferirDono(id, _uidDoAluno());
     await sessao.firestore.collection('itens').doc(id).update({
       'status': 'devolvido',
     });
   }
 
   Future<void> apagar(String id) async {
-    await _conferirDono(id, _uidVerificado());
+    await _conferirDono(id, _uidDoAluno());
     await sessao.firestore.collection('itens').doc(id).delete();
   }
 
-  String _uidVerificado() {
+  String _uidDoAluno() {
     final user = sessao.usuario;
-    if (user == null ||
-        !user.emailVerified ||
-        !emailPermitido(user.email ?? '')) {
-      throw StateError('Entre com um e-mail acadêmico verificado.');
+    if (user == null || !emailPermitido(user.email ?? '')) {
+      throw StateError('Entre com seu e-mail acadêmico.');
     }
     return user.uid;
   }

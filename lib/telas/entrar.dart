@@ -67,9 +67,7 @@ class _TelaEntrarState extends State<TelaEntrar> {
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Achados e perdidos da UNIPÊ. Use seu e-mail @cs.unipe.edu.br.',
-                    ),
+                    const Text('Achados e perdidos da UNIPÊ. $avisoDominio'),
                     const SizedBox(height: 24),
                     if (_cadastro) ...[
                       TextFormField(
@@ -97,9 +95,8 @@ class _TelaEntrarState extends State<TelaEntrar> {
                       decoration: const InputDecoration(
                         labelText: 'E-mail acadêmico',
                       ),
-                      validator: (valor) => emailPermitido(valor ?? '')
-                          ? null
-                          : 'Use seu e-mail @cs.unipe.edu.br.',
+                      validator: (valor) =>
+                          emailPermitido(valor ?? '') ? null : avisoDominio,
                     ),
                     const SizedBox(height: 16),
                     TextFormField(
@@ -162,86 +159,4 @@ class _TelaEntrarState extends State<TelaEntrar> {
       ),
     );
   }
-}
-
-class TelaVerificar extends StatefulWidget {
-  const TelaVerificar({
-    super.key,
-    required this.sessao,
-    required this.aoVerificar,
-  });
-  final Sessao sessao;
-  final VoidCallback aoVerificar;
-
-  @override
-  State<TelaVerificar> createState() => _TelaVerificarState();
-}
-
-class _TelaVerificarState extends State<TelaVerificar> {
-  bool _enviando = false;
-  String? _mensagem;
-
-  Future<void> _reenviar() async {
-    setState(() {
-      _enviando = true;
-      _mensagem = null;
-    });
-    try {
-      await widget.sessao.reenviarVerificacao();
-      if (mounted) {
-        setState(
-          () => _mensagem =
-              'Verificação enviada. Confira sua caixa de entrada e o spam.',
-        );
-      }
-    } catch (erro) {
-      if (mounted) setState(() => _mensagem = mensagemDeErro(erro));
-    } finally {
-      if (mounted) setState(() => _enviando = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-    appBar: AppBar(title: const Text('Verifique seu e-mail')),
-    body: Center(
-      child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'Abra o link enviado para ${widget.sessao.usuario?.email ?? "seu e-mail"}.',
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'O e-mail pode cair no spam. Após confirmar pelo link, toque em Já verifiquei.',
-              ),
-              const SizedBox(height: 24),
-              FilledButton(
-                onPressed: _enviando ? null : widget.aoVerificar,
-                child: const Text('Já verifiquei'),
-              ),
-              const SizedBox(height: 8),
-              OutlinedButton(
-                onPressed: _enviando ? null : _reenviar,
-                child: Text(_enviando ? 'Enviando…' : 'Reenviar verificação'),
-              ),
-              if (_mensagem != null)
-                Padding(
-                  padding: const EdgeInsets.only(top: 16),
-                  child: Text(_mensagem!),
-                ),
-              TextButton(
-                onPressed: _enviando ? null : widget.sessao.sair,
-                child: const Text('Sair'),
-              ),
-            ],
-          ),
-        ),
-      ),
-    ),
-  );
 }

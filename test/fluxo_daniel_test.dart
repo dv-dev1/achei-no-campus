@@ -40,29 +40,25 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('sessão não verificada não chega ao feed nem cria perfil', (
-    tester,
-  ) async {
-    final naoVerificado = Sessao(
-      auth: MockFirebaseAuth(
-        mockUser: MockUser(
-          uid: 'bruno',
-          email: 'bruno@cs.unipe.edu.br',
-          isEmailVerified: false,
-        ),
-        signedIn: true,
-      ),
-      firestore: firestore,
-    );
-    await abrir(tester, AppAchei(sessao: naoVerificado));
-    expect(find.text('Verifique seu e-mail'), findsOneWidget);
-    expect(find.text('Reenviar verificação'), findsOneWidget);
-    expect(find.text('Achei no Campus'), findsNothing);
-    expect((await firestore.collection('usuarios').get()).docs, isEmpty);
-
-    await tester.tap(find.text('Já verifiquei'));
+  testWidgets('cadastro leva ao feed', (tester) async {
+    final auth = MockFirebaseAuth(verifyEmailAutomatically: false);
+    final semConta = Sessao(auth: auth, firestore: firestore);
+    await abrir(tester, AppAchei(sessao: semConta));
+    await tester.tap(find.text('Criar uma conta'));
     await tester.pumpAndSettle();
-    expect(find.text('Verifique seu e-mail'), findsOneWidget);
+    await tester.enterText(find.byKey(const Key('nome')), 'Bruno');
+    await tester.enterText(
+      find.byKey(const Key('email')),
+      'bruno@cs.unipe.edu.br',
+    );
+    await tester.enterText(find.byKey(const Key('senha')), 'senha123');
+    await tester.tap(find.widgetWithText(FilledButton, 'Criar conta'));
+    await tester.pumpAndSettle();
+    expect(find.byTooltip('Perfil'), findsOneWidget);
+    expect(find.text('Verifique seu e-mail'), findsNothing);
+    final perfis = (await firestore.collection('usuarios').get()).docs;
+    expect(perfis, hasLength(1));
+    expect(perfis.single.data()['nome'], 'Bruno');
   });
 
   testWidgets('login recusa domínio externo sem autenticar', (tester) async {

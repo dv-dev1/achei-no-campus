@@ -1,3 +1,6 @@
+const dominioAcademico = '@cs.unipe.edu.br';
+const avisoDominio = 'Use seu e-mail $dominioAcademico.';
+
 bool emailPermitido(String email) =>
     RegExp(r'^[^@\s]+@cs\.unipe\.edu\.br$')
         .hasMatch(email.trim().toLowerCase());
