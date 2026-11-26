@@ -1,4 +1,5 @@
 import 'package:achei_no_campus/sessao.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:fake_cloud_firestore/fake_cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_auth_mocks/firebase_auth_mocks.dart';
@@ -16,6 +17,16 @@ class UsuarioEspia extends MockUser {
       );
 
   final eventos = <String>[];
+
+  // Roda dentro do updateDisplayName: simula o portão chegando antes do fim
+  // do cadastro (o authStateChanges dispara com o createUser).
+  Future<void> Function()? aoAtualizarNome;
+
+  @override
+  Future<void> updateDisplayName(String? displayName) async {
+    await aoAtualizarNome?.call();
+    await super.updateDisplayName(displayName);
+  }
 
   @override
   Future<void> reload() async {
@@ -52,7 +63,6 @@ void main() {
     final sessao = Sessao(auth: AuthComEspia(espia), firestore: firestore);
     await sessao.cadastrar('Ana', 'ana@cs.unipe.edu.br', 'senha123');
     expect(espia.eventos, isNot(contains('verificacao')));
-    expect((await firestore.collection('usuarios').get()).docs, isEmpty);
 
     expect(await sessao.prepararAcesso(), isTrue);
     expect(espia.eventos, isNot(contains('verificacao')));
@@ -62,6 +72,42 @@ void main() {
     expect(perfil['nome'], 'Ana');
     expect(perfil['curso'], '');
     expect(perfil['criadoEm'], isNotNull);
+  });
+
+  test(
+    'cadastro cria o perfil com o nome digitado quando não há perfil',
+    () async {
+      final espia = UsuarioEspia();
+      final firestore = FakeFirebaseFirestore();
+      final sessao = Sessao(auth: AuthComEspia(espia), firestore: firestore);
+      await sessao.cadastrar(
+        '  Lúcia Tester ',
+        'ana@cs.unipe.edu.br',
+        'senha123',
+      );
+      final perfil = (await firestore.collection('usuarios').doc('ana').get())
+          .data()!;
+      expect(perfil['nome'], 'Lúcia Tester');
+      expect(perfil['curso'], '');
+      expect(perfil['criadoEm'], isNotNull);
+    },
+  );
+
+  test('cadastro corrige o perfil que o portão criou antes, sem mexer em curso e criadoEm', () async {
+    final espia = UsuarioEspia();
+    final firestore = FakeFirebaseFirestore();
+    final criadoEm = Timestamp.fromDate(DateTime(2026, 11, 26, 10));
+    espia.aoAtualizarNome = () => firestore
+        .collection('usuarios')
+        .doc('ana')
+        .set({'nome': 'ana', 'curso': 'Computação', 'criadoEm': criadoEm});
+    final sessao = Sessao(auth: AuthComEspia(espia), firestore: firestore);
+    await sessao.cadastrar('Lúcia Tester', 'ana@cs.unipe.edu.br', 'senha123');
+    final perfil = (await firestore.collection('usuarios').doc('ana').get())
+        .data()!;
+    expect(perfil['nome'], 'Lúcia Tester');
+    expect(perfil['curso'], 'Computação');
+    expect(perfil['criadoEm'], criadoEm);
   });
 
   test(

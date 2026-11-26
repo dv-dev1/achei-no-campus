@@ -41,7 +41,22 @@ class Sessao {
       email: email.trim().toLowerCase(),
       password: senha,
     );
-    await credencial.user!.updateDisplayName(nome.trim());
+    final nomeLimpo = nome.trim();
+    await credencial.user!.updateDisplayName(nomeLimpo);
+    // O portão (authStateChanges) pode criar o perfil com o pedaço do e-mail
+    // antes do updateDisplayName terminar; aqui o nome digitado vence.
+    final ref = firestore.collection('usuarios').doc(credencial.user!.uid);
+    await firestore.runTransaction((transaction) async {
+      if ((await transaction.get(ref)).exists) {
+        transaction.update(ref, {'nome': nomeLimpo});
+      } else {
+        transaction.set(ref, {
+          'nome': nomeLimpo,
+          'curso': '',
+          'criadoEm': FieldValue.serverTimestamp(),
+        });
+      }
+    });
   }
 
   Future<void> entrar(String email, String senha) async {
