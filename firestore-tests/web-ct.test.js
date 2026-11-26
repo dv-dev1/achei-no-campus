@@ -358,7 +358,7 @@ test('CT-27 — primeira mensagem cria a conversa', { timeout: 240000 }, () => c
   assert.equal(await quantasConversas(), 1);
 }));
 
-test('CT-28 — conversa chega em tempo real na outra aba', { timeout: 240000 , todo: 'defeito #3: a conversa fica carregando para sempre depois da primeira mensagem' }, () => comDoisApps(async (dono, visitante) => {
+test('CT-28 — conversa chega em tempo real na outra aba', { timeout: 240000 }, () => comDoisApps(async (dono, visitante) => {
   await limparBanco();
   await entrarVerificado(dono, email('ct28a'));
   await entrarVerificado(visitante, email('ct28b'));
@@ -368,7 +368,7 @@ test('CT-28 — conversa chega em tempo real na outra aba', { timeout: 240000 , 
   await visitante.digitar('Escreva uma mensagem', 'Perdi ontem na Reitoria');
   await visitante.tocar('Enviar');
   await visitante.esperarTexto('Perdi ontem na Reitoria');
-  await dono.tocar('Mensagens');
+  await dono.tocarContendo('Mensagens');
   await dono.tocarContendo('Carteira preta');
   await dono.esperarTexto('Perdi ontem na Reitoria');
   await visitante.digitar('Escreva uma mensagem', 'Pode guardar');
@@ -377,7 +377,7 @@ test('CT-28 — conversa chega em tempo real na outra aba', { timeout: 240000 , 
   await dono.esperarTexto('Pode guardar');
 }));
 
-test('CT-29 e CT-30 — contador de não lidas sobe e zera ao abrir', { timeout: 240000 , todo: 'defeito #3: a conversa fica carregando para sempre depois da primeira mensagem' }, () => comDoisApps(async (dono, visitante) => {
+test('CT-29 e CT-30 — contador de não lidas sobe e zera ao abrir', { timeout: 240000 }, () => comDoisApps(async (dono, visitante) => {
   await limparBanco();
   await entrarVerificado(dono, email('ct29a'));
   await entrarVerificado(visitante, email('ct29b'));
@@ -387,12 +387,14 @@ test('CT-29 e CT-30 — contador de não lidas sobe e zera ao abrir', { timeout:
   await visitante.digitar('Escreva uma mensagem', 'E meu fone');
   await visitante.tocar('Enviar');
   await visitante.esperarTexto('E meu fone');
-  await dono.esperarRotulo('1');
-  await dono.tocar('Mensagens');
+  await dono.esperarRotulo('1\nMensagens');
+  await dono.tocarContendo('Mensagens');
   await dono.tocarContendo('Fone branco');
   await dono.esperarTexto('E meu fone');
+  await dono.tocar('Voltar');
   await dono.tocar('Feed');
-  await esperarSem(dono, '1');
+  await esperarSem(dono, '1\nMensagens');
+  await dono.esperarRotulo('Mensagens');
 }));
 
 test('CT-32 — mensagem vazia não é enviada', { timeout: 240000 }, () => comDoisApps(async (dono, visitante) => {
