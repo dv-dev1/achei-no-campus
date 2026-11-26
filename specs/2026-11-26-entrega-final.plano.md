@@ -433,7 +433,7 @@ dá para trocar depois).
 - [x] 1.1 CT-18 espera o feed
 - [x] 1.2 `docs/testes.md` e registro de 25/11; fecham #3, #4, #6, #8, #14
 - [x] ⏸ Etapa 1: push e registro
-- [ ] 2.1 Falha clara do navegador; fecha #2
+- [x] 2.1 Falha clara do navegador; fecha #2
 - [ ] ⏸ Etapa 2: push e registro
 - [ ] 3.1 Local inicial só se estiver na lista; fecha #15
 - [ ] ⏸ Etapa 3: push e registro
@@ -487,3 +487,39 @@ teste e o processo filho. Por decisão do Cauê, a correção entra na tarefa 2.
 **V6:** run `45879909965` (`e64c7a4`) `success` em 8 min 40 s. `npm test` deu 30 de 30, o
 `test:web` 1 de 1 e o `test:ct` 28 de 28, com `todo 0`. No CI, os 5 casos que falharam aqui
 passaram. As issues #3, #4, #6, #8 e #14 fecharam pelo `8d2f48d`.
+
+### Etapa 2 — 26/11/2026
+
+**Antes de começar:** a tarefa 2.1 foi revista (`44c6654`) para cobrir o `test:web`, que tem spawn
+próprio, e as duas abas do `test:ct`. A decisão em aberto foi fechada: os testes ficam em
+`navegador.test.js`.
+
+**Commits:** `18fbb02` (mensagem com `CHROME_BIN` no `abrirApp` e no `test:web`; `Closes #2`),
+`dac9dc7` (o `abrirApp` fecha o navegador e o servidor em qualquer falha; opções `raiz` e
+`limite`; `comDoisApps` e CT-17 fecham a primeira aba) e `7055176`, este um achado da revisão: no
+`test:web`, o `caminhoDoNavegador()` rodava fora do `try`, e numa máquina sem navegador o servidor
+ficava aberto e o teste travava. Por decisão do Cauê, entrou nesta etapa.
+
+**Testes novos, vistos falhando antes da correção:**
+- `CHROME_BIN` inexistente: antes, o `abrirApp` estourava o prazo de 20 s do teste. Agora rejeita em
+  menos de 5 s, citando `CHROME_BIN`.
+- App que não carrega (pasta vazia, `limite` de 2 s, num processo filho): antes, o filho não saía em
+  30 s. Agora sai em cerca de 3 s.
+- `test:web` numa máquina sem Chrome nem Edge, simulada por um preload que troca `PROGRAMFILES`,
+  `PROGRAMFILES(X86)` e `LOCALAPPDATA` (pelo ambiente não dá, porque o Windows reinjeta
+  `PROGRAMFILES`): o arquivo antigo travou até o `timeout` matar, aos 30 s; o novo falha e sai em
+  1 s com `Nenhum Chrome ou Edge encontrado em: … Defina CHROME_BIN…`.
+
+**Verificação nesta máquina:**
+
+| Id | Resultado |
+|---|---|
+| V3 | `tests 32 · pass 32 · fail 0` (os 30 de antes e os 2 novos) |
+| V4 sem `CHROME_BIN` e com `CHROME_BIN` no Edge | `pass 1` nos dois (depois do `7055176`) |
+| `test:web` com `CHROME_BIN` inexistente | falha em 144 ms: `Não foi possível abrir o navegador em "C:/nao-existe/chrome.exe" (ENOENT). Defina CHROME_BIN…` |
+| V5 completo | `tests 28 · pass 28 · fail 0 · todo 0`, sem travar |
+
+**Execução:** o subagente em Sonnet fez os commits `18fbb02` e `dac9dc7`. A revisão em Opus aprovou os
+dois e achou o caso do `7055176`.
+
+**V6:** a preencher depois do push.
