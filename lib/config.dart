@@ -1,3 +1,7 @@
+/// `flutter build web --dart-define=FIREBASE=producao` liga o app ao projeto
+/// real; sem o define, ele fala só com os emuladores (testes e CI).
+const modoProducao = String.fromEnvironment('FIREBASE') == 'producao';
+
 const dominioAcademico = '@cs.unipe.edu.br';
 const avisoDominio = 'Use seu e-mail $dominioAcademico.';
 

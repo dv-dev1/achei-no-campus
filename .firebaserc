@@ -1,1 +1,6 @@
-{"projects": {"default": "demo-achei-no-campus"}}
+{
+  "projects": {
+    "default": "demo-achei-no-campus",
+    "producao": "achei-no-campus-unipe"
+  }
+}

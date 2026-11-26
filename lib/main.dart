@@ -4,6 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 import 'config.dart';
 import 'firebase_local.dart';
+import 'firebase_producao.dart';
 import 'sessao.dart';
 import 'telas/entrar.dart';
 import 'telas/inicio.dart';
@@ -14,7 +15,9 @@ import 'tema.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await inicializarFirebaseLocal();
+    await (modoProducao
+        ? inicializarFirebaseProducao()
+        : inicializarFirebaseLocal());
     runApp(const AppAchei());
   } catch (_) {
     runApp(
@@ -25,7 +28,9 @@ Future<void> main() async {
             child: Padding(
               padding: EdgeInsets.all(24),
               child: Text(
-                'Não foi possível iniciar o app. Inicie os emuladores de Auth e Firestore e tente novamente.',
+                modoProducao
+                    ? 'Não foi possível conectar. Confira sua internet e tente de novo.'
+                    : 'Não foi possível iniciar o app. Inicie os emuladores de Auth e Firestore e tente novamente.',
               ),
             ),
           ),
