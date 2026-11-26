@@ -16,10 +16,11 @@ o app no ar com link público, porque a apresentação ainda não tem data, mas 
 **1 → 2 → 4 → 6 → 7 → 3 → 5 → 8 → 9**. As dependências continuam valendo: a 6 depois da 4, e a 5
 depois da 3.
 
-Consequência: a 3 e a 5 mudam `lib/` **depois** do primeiro deploy (etapa 7). Por isso, cada uma
+Consequência: a 3 e a 5 mudam `lib/` **depois** do primeiro deploy (etapa 7). ~~Por isso, cada uma
 termina com um redeploy do Hosting, com os dois comandos da tarefa 7.1 (build com os
 `--dart-define` e `firebase deploy --only hosting`) e uma olhada rápida na URL pública. Isso entra
-no ponto de parada delas.
+no ponto de parada delas.~~ (26/11/2026, D10: com o GitHub Pages, o CI publica a cada push. Resta
+só conferir a URL pública no ponto de parada delas.)
 
 ## Restrições globais
 
@@ -73,7 +74,8 @@ caso que confere a tela sem esperar pode falhar aqui e passar lá (foi o CT-18).
 | `test/sessao_test.dart`, `test/fluxo_daniel_test.dart` | 4 | testes do login |
 | `firestore-tests/rules.test.js`, `firestore-tests/chat.test.js` | 4 | testes de regras |
 | `lib/firebase_producao.dart` (novo), `lib/firebase_options.dart` (gerado) | 6 | inicialização com o projeto real |
-| `.firebaserc`, `firebase.json` | 6, 7 | alias do projeto real e hosting |
+| `.firebaserc`, `firebase.json` | 6 | alias do projeto real |
+| `.github/workflows/ci.yml` | 7 | job `pages` (D10) |
 | `docs/testes.md`, `docs/requisitos.md`, `docs/diagramas/*`, `README.md`, `docs/visita-campus.md`, `docs/divisao-de-tarefas.md` | todas | documentação |
 
 ---
@@ -178,8 +180,8 @@ caso que confere a tela sem esperar pode falhar aqui e passar lá (foi o CT-18).
   como bloqueio.
 - **Commit:** `fix: editar item com local que saiu da lista abre a tela`, corpo com `Closes #15`.
 
-**⏸ Ponto de parada da etapa 3.** Com a ordem nova, inclui o redeploy do Hosting (ver "Ordem de
-execução").
+**⏸ Ponto de parada da etapa 3.** Com a ordem nova, inclui conferir a URL pública depois do V6 (o CI
+publica sozinho, D10).
 
 ---
 
@@ -292,8 +294,8 @@ e-mail do domínio.
 - **Pronto quando:** testes verdes com a lista nova.
 - **Commit:** `feat: lista de locais conferida pelo Cauê`, corpo com `Closes #10`.
 
-**⏸ Ponto de parada da etapa 5.** Com a ordem nova, inclui o redeploy do Hosting (ver "Ordem de
-execução").
+**⏸ Ponto de parada da etapa 5.** Com a ordem nova, inclui conferir a URL pública depois do V6 (o CI
+publica sozinho, D10).
 
 ---
 
@@ -354,19 +356,43 @@ dá para trocar depois).
 
 ---
 
-## Etapa 7 — #7: versão web no Firebase Hosting
+## Etapa 7 — #7: versão web no GitHub Pages (D10)
 
-### Tarefa 7.1 — Hosting e deploy
+> Reescrita em 26/11/2026 pela D10: a hospedagem passou do Firebase Hosting para o GitHub Pages do
+> repo. O desenho antigo (seção `hosting` no `firebase.json` e `firebase deploy --only hosting`) não
+> é mais feito. A #7 se chama "Deploy da versão web no Firebase Hosting", mas fecha do mesmo jeito,
+> pelo commit; a troca fica registrada aqui (D5: nada de comentário na issue).
 
-- **Arquivos:** `firebase.json`; `README.md`.
+**Ações de outras pessoas, antes da tarefa 7.1 (pare e peça):**
+1. **Daniel** (dono do repo; o Cauê não é admin): Settings → Pages → Build and deployment →
+   Source: **GitHub Actions**. Conferir depois com `gh api repos/dv-dev1/achei-no-campus/pages`, que
+   hoje devolve 404.
+2. **Cauê**, no console do Firebase do projeto real: Authentication → Settings → Domínios
+   autorizados → adicionar `dv-dev1.github.io`. Sem isso, o login na URL pública falha com
+   `auth/unauthorized-domain`.
+
+### Tarefa 7.1 — Publicação pelo CI
+
+- **Arquivos:** `.github/workflows/ci.yml`; `README.md`.
 - **O que muda:**
-  - `firebase.json` ganha `"hosting": {"public": "build/web", "ignore": ["firebase.json", "**/.*"], "rewrites": [{"source": "**", "destination": "/index.html"}]}`.
-    Conferir que o caminho `build/web` resolve a partir da raiz (o `--config ../firebase.json` é
-    lido de `firestore-tests/`).
-  - Build: `flutter build web --dart-define=FIREBASE=producao --dart-define=CLOUDINARY_CLOUD_NAME=tbeq7obd --dart-define=CLOUDINARY_UPLOAD_PRESET=achei_unsigned`.
-  - Deploy: de `firestore-tests/`, `npx --no-install firebase deploy --config ../firebase.json --only hosting --project producao`.
-  - README: link da versão no ar no topo, "Status", e "como refazer o deploy" (os dois comandos).
-- **Testes (na URL pública `https://<id>.web.app`, aba anônima, duas contas de teste):**
+  - `ci.yml` ganha o job `pages`, com `needs: [flutter, firestore]` e
+    `if: github.event_name == 'push' && github.ref == 'refs/heads/main'`. Ele só publica quando
+    os testes passaram, e nunca em PR. Permissões do job: `pages: write` e `id-token: write`;
+    `environment: github-pages`. Passos:
+    1. `actions/checkout`, e o `subosito/flutter-action` com a mesma versão dos outros jobs;
+    2. `flutter pub get --enforce-lockfile`;
+    3. `flutter build web --release --base-href /achei-no-campus/ --dart-define=FIREBASE=producao --dart-define=CLOUDINARY_CLOUD_NAME=tbeq7obd --dart-define=CLOUDINARY_UPLOAD_PRESET=achei_unsigned`;
+    4. `actions/upload-pages-artifact` com `path: build/web`;
+    5. `actions/deploy-pages`.
+  - Nada muda nos outros jobs: eles continuam buildando sem o define e testando nos emuladores.
+  - O `web/index.html` já tem `<base href="$FLUTTER_BASE_HREF">`, e os scripts são relativos. O app
+    usa a URL com `#`, então as rotas funcionam no Pages sem o `404.html`.
+  - README: link `https://dv-dev1.github.io/achei-no-campus/` no topo, a seção "Status", e "como a
+    versão no ar é atualizada" (push na `main` com o CI verde; o job `pages` faz o resto).
+- **Consequência para a ordem de execução:** o redeploy da etapa 3 e da etapa 5 passa a ser
+  automático, pelo próprio push. No ponto de parada delas, basta conferir a URL pública depois do
+  V6.
+- **Testes (na URL pública `https://dv-dev1.github.io/achei-no-campus/`, aba anônima, duas contas de teste):**
   1. cadastrar e cair no feed;
   2. publicar com foto (Cloudinary) e ver a foto no detalhe;
   3. recarregar a página e continuar logado;
@@ -376,10 +402,11 @@ dá para trocar depois).
 - **Decisão em aberto, a perguntar ao Cauê ao fim da conferência:** apagar os dados de teste ou
   deixar alguns itens de exemplo para o professor. Se apagar: itens e conversas pelo console do
   Firestore, contas pelo console do Authentication, fotos pelo Media Library do Cloudinary.
-- **Pronto quando:** os cinco itens conferidos, anotados no registro, e o README com o link.
-- **Commit:** `feat: versão web publicada no Firebase Hosting`, corpo com `Closes #7`.
+- **Pronto quando:** o job `pages` verde no CI, os cinco itens conferidos e anotados no registro,
+  e o README com o link.
+- **Commit:** `feat: versão web publicada no GitHub Pages pelo CI`, corpo com `Closes #7`.
 
-**⏸ Ponto de parada da etapa 7.** V6.
+**⏸ Ponto de parada da etapa 7.** V6, incluindo o job `pages`.
 
 ---
 
@@ -464,7 +491,7 @@ dá para trocar depois).
 - [ ] 6.1 Modo produção no código
 - [ ] 6.2 Projeto real ligado; fecha #5
 - [ ] ⏸ Etapa 6: push e registro
-- [ ] 7.1 Hosting e deploy; fecha #7
+- [ ] 7.1 GitHub Pages pelo CI (D10); fecha #7
 - [ ] ⏸ Etapa 7: push e registro
 - [ ] 8.1 Requisitos e diagramas conferidos; fecha #9
 - [ ] ⏸ Etapa 8: push e registro

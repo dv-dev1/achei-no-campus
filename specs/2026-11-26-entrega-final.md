@@ -29,6 +29,7 @@ Como fica pelo fluxo do CLAUDE.md:
 | D7 | **Pessoa de fora usa o app (#13, CT-42):** entra; o Cauê arruma a pessoa, e o plano traz um roteiro curto e onde anotar. |
 | D8 | **Itens com local fora da lista (#15):** sem migração. A produção começa vazia; o campo abre vazio, e o validador pede um local válido. |
 | D9 | "O Cauê faz tudo" vale para esta fase. Os docs do repo registram a troca de responsável em cada issue. |
+| D10 | **(26/11, depois da etapa 2) A versão web vai para o GitHub Pages do próprio repo, e não para o Firebase Hosting.** O link fica `https://dv-dev1.github.io/achei-no-campus/`, e o CI publica a cada push na `main` com os testes verdes. O Firebase real (D4, etapa 6) continua para o login e o banco. O Cauê não é admin do repo: o Daniel liga o Pages (Settings → Pages → Source: GitHub Actions), e o Cauê autoriza o domínio `dv-dev1.github.io` no Firebase Authentication. A seção 7 abaixo fica como histórico; o "como" está na etapa 7 do plano. |
 
 ## Escopo, por etapa (ordem de execução)
 
@@ -86,6 +87,9 @@ Aplicar em `lib/config.dart` a lista que o Cauê passar, com `Outro` no fim. Mar
 - **Depende da etapa 4**, porque as regras publicadas já são as sem verificação.
 
 ### 7. #7: deploy no Firebase Hosting
+
+> Trocado pelo GitHub Pages em 26/11 (D10). O texto abaixo é o desenho original.
+
 - Seção `hosting` no `firebase.json`, com `build/web` e rewrite para `/index.html`.
 - Build com `--dart-define=FIREBASE=producao` e o Cloudinary (`tbeq7obd` / `achei_unsigned`), depois `firebase deploy --only hosting`.
 - README com o link no topo, "Status", os dois modos e como refazer o deploy.
