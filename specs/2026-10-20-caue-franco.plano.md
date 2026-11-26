@@ -505,9 +505,16 @@ os dois passam. O app não mudou: a #3 já estava corrigida desde `99b7646`.
 **Mudança:** `firestore-tests/web-ct.test.js` recebe o ajuste e os dois casos perdem o `todo`.
 
 **Resultado:** `npm run test:ct` com `tests 28 · pass 27 · fail 1 · todo 0` (CT-28 em 38 s,
-CT-29/30 em 31 s). A falha é o CT-18, fora da #3, descrito abaixo.
+CT-29/30 em 31 s). ~~A falha é o CT-18, fora da #3, descrito abaixo.~~ (26/11/2026: o CT-18
+falhava só nesta máquina; ver a correção abaixo.)
 
-**CT-18 (feed vazio) falha em `b1c16f5`**, também sozinho, nas três vezes em que rodou. O caso
+**Correção (26/11/2026):** o CT-18 **passa no CI**: no `739c025`, o `test:ct` deu
+`tests 28 · pass 28 · fail 0 · todo 0`. Ele só falhava nesta máquina, que é mais lenta que o
+CI, porque conferia a tela sem esperar o feed carregar. O conserto entrou em `93878db`, na tarefa
+1.1 de `specs/2026-11-26-entrega-final.plano.md`, e o caso passou três vezes seguidas aqui. O
+texto abaixo fica como registro do diagnóstico.
+
+**CT-18 (feed vazio) falha em `b1c16f5`** (nesta máquina), também sozinho, nas três vezes em que rodou. O caso
 confere `tem('Nenhum item ainda.')` logo depois de entrar, sem esperar o feed carregar. Na
 falha, a tela só tem a barra de cima e as abas, ou seja, o feed ainda está no carregando.
 Trocando a conferência por `esperarTexto('Nenhum item ainda.')`, o caso passou (troca desfeita;
@@ -519,7 +526,7 @@ não entrou no commit). O app mostra a frase (`lib/telas/feed.dart:147`), e nenh
 | Quem | O quê |
 |---|---|
 | Lúcio | ~~Ajustar o roteiro do CT-28 e do CT-29/30~~ (feito pelo Cauê em 25/11, ver a retomada da #3); fechar a #3 e a #4 |
-| Lúcio | CT-18: esperar a frase do feed vazio em vez de conferir na hora (ver a retomada da #3) |
+| Lúcio | ~~CT-18: esperar a frase do feed vazio em vez de conferir na hora (ver a retomada da #3)~~ (feito pelo Cauê em 26/11/2026, `93878db`) |
 | Lúcio | Revisar requisitos e diagramas (#9), agora liberada pela #8 |
 | Lúcio | CT-14 a CT-16 no Android (#11) e reteste da coluna W |
 | Daniel | Usar `tbeq7obd` e `achei_unsigned` nos builds da #5, #7 e #11 |

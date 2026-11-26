@@ -243,7 +243,7 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 1. Com um item de título `Fone de ouvido preto`, digitar `fone preto` na busca.
 
 **Esperado:** o item continua na lista — é assim que a pessoa digita de verdade.
-**Obtido:** ❌ falha em todas as plataformas. A busca procura o texto digitado como um pedaço só, então duas palavras separadas no título não casam. Defeito registrado para Cauê.
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 25/11/2026, `c0a6285`; corrigido pela #4) · A ⏳ · I ⏳
 
 ### CT-22 — Limpar filtros
 
@@ -290,7 +290,7 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. Escrever `Achei na Biblioteca, posso entregar amanhã` e enviar.
 
 **Esperado:** a mensagem aparece à direita, em azul, e a conversa passa a existir no Firestore com o ID `{itemId}_{uidDoB}`.
-**Obtido:** W ❌ — a conversa fica no indicador de carregamento para sempre depois da primeira mensagem; a mensagem é gravada e aparece ao recarregar. Issue [#3](https://github.com/dv-dev1/achei-no-campus/issues/3). · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 25/11/2026, `c0a6285`; corrigido pela [#3](https://github.com/dv-dev1/achei-no-campus/issues/3)) · A ⏳ · I ⏳
 
 ### CT-28 — Conversa em tempo real entre dois aparelhos
 
@@ -298,21 +298,21 @@ Cada caso traz passos, resultado esperado e o resultado obtido por plataforma:
 2. B envia uma mensagem.
 
 **Esperado:** a mensagem aparece no aparelho de A em poucos segundos, sem recarregar.
-**Obtido:** W ❌ — a conversa fica no indicador de carregamento para sempre depois da primeira mensagem; a mensagem é gravada e aparece ao recarregar. Issue [#3](https://github.com/dv-dev1/achei-no-campus/issues/3). · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 25/11/2026, `c0a6285`; corrigido pela [#3](https://github.com/dv-dev1/achei-no-campus/issues/3)) · A ⏳ · I ⏳
 
 ### CT-29 — Contador de não lidas sobe
 
 1. B envia mensagem com A **fora** da conversa.
 
 **Esperado:** a aba **Mensagens** de A mostra o número `1`, e a conversa aparece na lista com a última mensagem e a hora.
-**Obtido:** W ❌ — a conversa fica no indicador de carregamento para sempre depois da primeira mensagem; a mensagem é gravada e aparece ao recarregar. Issue [#3](https://github.com/dv-dev1/achei-no-campus/issues/3). · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 25/11/2026, `c0a6285`; corrigido pela [#3](https://github.com/dv-dev1/achei-no-campus/issues/3)) · A ⏳ · I ⏳
 
 ### CT-30 — Contador zera ao abrir
 
 1. A abre a conversa do CT-29.
 
 **Esperado:** o número some da aba e continua zerado ao reabrir o app.
-**Obtido:** W ❌ — a conversa fica no indicador de carregamento para sempre depois da primeira mensagem; a mensagem é gravada e aparece ao recarregar. Issue [#3](https://github.com/dv-dev1/achei-no-campus/issues/3). · A ⏳ · I ⏳
+**Obtido:** W ✅ (automatizado em `firestore-tests/web-ct.test.js`, 25/11/2026, `c0a6285`; corrigido pela [#3](https://github.com/dv-dev1/achei-no-campus/issues/3)) · A ⏳ · I ⏳
 
 ### CT-31 — Terceiro não lê a conversa
 
@@ -466,8 +466,8 @@ falta, nesta ordem: um AVD Android instalado, e o Chrome para a coluna **W**.
 
 | Issue | Sintoma | Severidade | Responsável | Estado |
 |---|---|---|---|---|
-| [#3](https://github.com/dv-dev1/achei-no-campus/issues/3) | A conversa fica carregando para sempre depois da primeira mensagem | alta | Cauê | aberta |
-| [#4](https://github.com/dv-dev1/achei-no-campus/issues/4) | Busca com duas palavras não encontra o item | média | Cauê | aberta |
+| [#3](https://github.com/dv-dev1/achei-no-campus/issues/3) | A conversa fica carregando para sempre depois da primeira mensagem | alta | Cauê | fechada em 26/11/2026 (ver a rodada de 26/11) |
+| [#4](https://github.com/dv-dev1/achei-no-campus/issues/4) | Busca com duas palavras não encontra o item | média | Cauê | fechada em 26/11/2026 (ver a rodada de 26/11) |
 | [#2](https://github.com/dv-dev1/achei-no-campus/issues/2) | `npm run test:web` falha com `ENOENT` em máquina Windows sem Chrome no caminho padrão | baixa | Daniel | aberta |
 | [#15](https://github.com/dv-dev1/achei-no-campus/issues/15) | Editar item cujo local saiu da lista de `locais` não abre a tela | média | Daniel | aberta |
 
@@ -528,6 +528,43 @@ O que o navegador **não** cobre, e por isso segue manual: foto pela galeria e
 pela câmera (CT-14, CT-15, CT-16), o terceiro que não lê a conversa (CT-31, já
 coberto por `firestore-tests/chat.test.js`), e tudo que depende de toque em
 aparelho real (coluna A) ou de ir ao campus (CT-44).
+
+### Rodada de 26/11/2026 — `test:ct` no CI
+
+O CI do `739c025` (run `45757719330`) passou nos dois jobs, com o `test:ct` como passo
+do job `flutter`:
+
+```
+npm test (firestore-tests)          success
+npm run test:web                    tests 1 · pass 1 · fail 0 · todo 0
+npm run test:ct                     tests 28 · pass 28 · fail 0 · todo 0
+```
+
+| Caso | Resultado | Issue |
+|---|---|---|
+| CT-21 — busca com mais de uma palavra | ✅ | #4 fecha |
+| CT-27 — primeira mensagem cria a conversa | ✅ | #3 fecha |
+| CT-28 — conversa chega em tempo real na outra aba | ✅ | #3 fecha |
+| CT-29 e CT-30 — contador de não lidas sobe e zera ao abrir | ✅ | #3 fecha |
+| CT-18 — feed vazio | ✅ | — |
+
+A #3 já estava corrigida no app desde `99b7646`. O que mantinha o CT-28 e o CT-29/30
+vermelhos era o roteiro, que procurava `Mensagens` e `1` por igualdade, quando o rótulo da
+aba com não lidas é `1\nMensagens`. O roteiro foi ajustado em `c0a6285` (25/11/2026), e os
+dois casos perderam o `todo`.
+
+O CT-18 passava no CI e falhava só na máquina do Cauê, porque conferia a frase logo depois
+de entrar, sem esperar o feed carregar. Desde `93878db` ele espera a frase, e passou três
+vezes seguidas nessa máquina.
+
+Também fecham nesta rodada:
+
+- a **#14**, porque o `test:ct` roda no CI a cada push desde `d7f7a17`, com limite de 20
+  minutos desde `f35f399`;
+- a **#6**, porque o Cloudinary foi configurado e registrado no README em `70c52f3`;
+- a **#8**, porque `docs/requisitos.md` e `docs/diagramas/` foram escritos em `1f7fac5` e
+  `b3c74ac`. A revisão deles contra o app é a #9.
+
 ## 4. Próximos passos por responsável
 
 Entrega da fase de testes para a correção. O QA não corrige: registra, acompanha
