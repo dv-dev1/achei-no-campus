@@ -100,33 +100,52 @@ caso que confere a tela sem esperar pode falhar aqui e passar lá (foi o CT-18).
 
 ### Tarefa 2.1 — `abrirApp` falha logo, citando `CHROME_BIN`
 
-- **Arquivos:** `firestore-tests/driver.mjs` (`abrirApp`, linhas 90-110, e `conectar`);
-  `firestore-tests/navegador.test.js` ou `firestore-tests/web.test.js` (ver decisão).
+> Revisada em 26/11/2026, antes de começar, com o que a etapa 1 achou. A #2 é sobre o `test:web`,
+> e o `web.test.js` tem o próprio `spawn` (não usa o `abrirApp`). Hoje ele já falha rápido, mas com
+> o `ENOENT` cru. Além disso, quando o app não carrega, a suíte trava: o `abrirApp` não fecha o que
+> abriu, e o CT-17 e o `comDoisApps` abrem a segunda aba fora do `try`. A versão anterior desta
+> tarefa só previa o `abrirApp`.
+
+- **Arquivos:** `firestore-tests/driver.mjs` (`abrirApp`, `conectar`, novo `erroDoNavegador`);
+  `firestore-tests/web.test.js` (o `spawn` próprio); `firestore-tests/web-ct.test.js`
+  (`comDoisApps` e CT-17); `firestore-tests/navegador.test.js` (testes novos); `README.md` (~93).
+- **Decisão (fechada):** os testes novos vão em `navegador.test.js`, que roda no `npm test` e no job
+  `firestore` do CI, porque o `servir()` não precisa do `build/web` para subir. O runner Ubuntu do
+  CI já traz o `google-chrome`.
 - **Interfaces:**
-  - `conectar(perfil, erroDoNavegador)`: `erroDoNavegador` é uma função `() => Error | undefined`;
-    a espera pelo `DevToolsActivePort` para assim que ela devolver um erro.
-  - Erro lançado por `abrirApp` quando o spawn falha: `Error` com mensagem
-    `Não foi possível abrir o navegador em "<caminho>" (<código>). Defina CHROME_BIN com o caminho do Chrome ou do Edge.`
-    e `cause` = erro original.
-  - **Limpeza em qualquer falha (acrescentado em 26/11/2026, achado da etapa 1):** se qualquer passo
-    do `abrirApp` falhar depois do spawn, inclusive o `pronto()` (`driver.mjs:322`, hoje fora do
-    `try`), o navegador e o servidor são fechados antes de relançar o erro. Hoje eles ficam abertos,
-    o processo do `node --test` não termina e a suíte trava sem imprimir o resumo. O prazo de 20 s
-    do `pronto()` não muda.
-- **Decisão em aberto:** onde mora o teste. Se `servir()` precisar de `build/web` para subir, o
-  teste vai em `web.test.js` (que já roda depois do build); senão, em `navegador.test.js`, que roda
-  no `npm test` e no job `firestore` do CI.
-- **Testes:**
-  - novo caso: com `CHROME_BIN` apontando para um arquivo que não existe, `abrirApp()` rejeita
-    em menos de 5 s e a mensagem contém `CHROME_BIN`;
-  - V3 (inclui os testes já existentes de `caminhoDoNavegador`);
-  - V4 duas vezes: sem `CHROME_BIN` e com `CHROME_BIN` no Edge
-    (`C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe`), os dois `pass 1`.
-  - novo caso: com o app sem carregar (por exemplo, servindo uma pasta sem o `build/web`),
-    `abrirApp()` rejeita e o processo do teste termina sozinho, sem Chrome nem servidor abertos;
-- **Pronto quando:** os quatro testes acima passam e o `README.md` (linha ~93) diz o que fazer quando
+  - `export function erroDoNavegador(caminho, erro) → Error`: mensagem
+    `Não foi possível abrir o navegador em "<caminho>" (<erro.code>). Defina CHROME_BIN com o caminho do Chrome ou do Edge.`
+    e `cause` = `erro`. Usada pelo `abrirApp` e pelo `web.test.js`.
+  - `conectar(perfil, falhaDoNavegador)`: `falhaDoNavegador` é `() => Error | undefined`. A espera
+    pelo `DevToolsActivePort` para e lança assim que ela devolver um erro.
+  - `abrirApp({ raiz, limite } = {}) → Promise<app>`: `raiz` é a pasta servida (padrão: `build/web`)
+    e `limite` é o prazo, em ms, do `pronto()` (padrão: 20000, que não muda). As chamadas atuais,
+    sem argumento, seguem iguais.
+  - Spawn que falha: o `abrirApp` rejeita com `erroDoNavegador(...)` em menos de 5 s.
+  - **Limpeza em qualquer falha:** se qualquer passo do `abrirApp` falhar depois do `servir()`,
+    inclusive o `pronto()` (hoje fora do `try`), o navegador e o servidor são fechados (e o perfil
+    apagado) antes de relançar o erro original.
+  - `web.test.js`: o erro do spawn passa por `erroDoNavegador`. Nada mais muda no caso.
+  - `comDoisApps` e CT-17: se a segunda aba não abrir, a primeira é fechada antes de propagar o
+    erro.
+- **Testes** (escrever primeiro e ver falhar):
+  - `navegador.test.js`, caso 1: `CHROME_BIN` aponta para um arquivo que não existe. O
+    `abrirApp()` rejeita em menos de 5 s, e a mensagem contém `CHROME_BIN`.
+  - `navegador.test.js`, caso 2: `abrirApp({ raiz: <pasta temporária vazia>, limite: 2000 })` roda
+    num processo Node filho. O filho imprime o erro e **sai sozinho** em menos de 30 s. Hoje ele
+    fica pendurado: isso é o que prova a limpeza. Se nenhum navegador for achado, o caso é pulado.
+  - V3 (inclui os 3 testes de `caminhoDoNavegador`).
+  - V4 duas vezes, `pass 1` nas duas: sem `CHROME_BIN`, e com
+    `CHROME_BIN="C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"`.
+  - `test:web` com `CHROME_BIN` num arquivo que não existe: falha em segundos, com a mensagem nova.
+  - V5 filtrado em `CT-17` e `CT-28` (os dois de duas abas), para conferir que nada quebrou.
+- **Pronto quando:** os testes acima passam, e o `README.md` (linha ~93) diz o que fazer quando
   aparece a mensagem.
-- **Commit:** `fix: test:web e test:ct avisam logo quando o navegador não abre`, corpo com `Closes #2`.
+- **Commits** (um assunto cada, nesta ordem):
+  1. `fix: test:web e test:ct avisam logo quando o navegador não abre`, corpo terminando em
+     `Closes #2` (`erroDoNavegador`, `conectar`, `web.test.js`, caso 1, README).
+  2. `fix: test:ct fecha o navegador quando o app não carrega a tempo` (limpeza do `abrirApp`,
+     opções `raiz` e `limite`, `comDoisApps`, CT-17, caso 2).
 
 **⏸ Ponto de parada da etapa 2.**
 
