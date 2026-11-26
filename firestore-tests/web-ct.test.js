@@ -208,7 +208,7 @@ test('CT-13 — aviso de LGPD na categoria Documentos', { timeout: 180000 }, () 
 test('CT-18 — feed vazio explica o que fazer', { timeout: 180000 }, () => comApp(async (app) => {
   await limparBanco();
   await entrarVerificado(app, email('ct18'));
-  assert.ok(await app.tem('Nenhum item ainda.'), (await app.rotulos()).join(' | '));
+  await app.esperarTexto('Nenhum item ainda.');
 }));
 
 test('CT-20 — busca ignora acento e maiúscula', { timeout: 180000 }, () => comApp(async (app) => {
